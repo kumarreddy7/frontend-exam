@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Frontend Coding Exam</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Space+Grotesk:wght@300;400;600&display=swap');
+
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --border: #222222;
+    --accent: #00ff88;
+    --accent2: #ff3366;
+    --text: #e8e8e8;
+    --muted: #555;
+    --warn: #ffaa00;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Space Grotesk', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* SCREENS */
+  .screen { display: none; min-height: 100vh; }
+  .screen.active { display: flex; flex-direction: column; }
+
+  /* LOGIN SCREEN */
+  #screen-login {
+    align-items: center;
+    justify-content: center;
+    background:
+      radial-gradient(ellipse 60% 40% at 70% 20%, #00ff8810 0%, transparent 60%),
+      radial-gradient(ellipse 50% 30% at 20% 80%, #ff336610 0%, transparent 60%),
+      var(--bg);
+  }
+
+  .login-box {
+    width: 100%;
+    max-width: 420px;
+    padding: 48px 40px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    position: relative;
+  }
+
+  .login-box::before {
+    content: '';
+    position: absolute;
+    top: -1px; left: 0;
+    width: 80px; height: 2px;
+    background: var(--accent);
+  }
+
+  .brand {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+  }
+
+  h1 {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 13px;
+    margin-bottom: 36px;
+  }
+
+  label {
+    display: block;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    margin-top: 20px;
+  }
+
+  input[type="text"], input[type="password"] {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 14px;
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  input:focus { border-color: var(--accent); }
+
+  .btn {
+    display: inline-block;
+    padding: 12px 28px;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #000;
+    width: 100%;
+    margin-top: 28px;
+  }
+
+  .btn-primary:hover { background: #00e678; }
+  .btn-primary:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
+
+  .btn-danger {
+    background: var(--accent2);
+    color: #fff;
+    padding: 10px 24px;
+  }
+
+  .btn-submit {
+    background: var(--accent);
+    color: #000;
+    padding: 10px 32px;
+  }
+
+  .error-msg {
+    margin-top: 14px;
+    padding: 10px 14px;
+    background: #ff336615;
+    border-left: 2px solid var(--accent2);
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent2);
+    display: none;
+  }
+
+  .rules {
+    margin-top: 28px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    background: #0d0d0d;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 2;
+  }
+
+  .rules span { color: var(--accent); font-family: var(--mono); }
+
+  /* EXAM SCREEN */
+  #screen-exam { flex-direction: column; }
+
+  .exam-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .exam-meta {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .exam-meta strong { color: var(--text); }
+
+  #timer {
+    font-family: var(--mono);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent);
+    min-width: 80px;
+    text-align: center;
+    padding: 6px 16px;
+    border: 1px solid #00ff8830;
+    background: #00ff8808;
+    transition: color 0.3s, border-color 0.3s;
+  }
+
+  #timer.warn { color: var(--warn); border-color: #ffaa0050; background: #ffaa0008; }
+  #timer.danger { color: var(--accent2); border-color: #ff336650; background: #ff336608; animation: pulse 1s infinite; }
+
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity: 0.6; } }
+
+  .exam-actions { display: flex; gap: 10px; align-items: center; }
+
+  .exam-body {
+    flex: 1;
+    max-width: 960px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 32px 24px 80px;
+  }
+
+  .set-badge {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid #00ff8840;
+    padding: 3px 10px;
+    margin-bottom: 28px;
+  }
+
+  /* QUESTION CARD */
+  .question-card {
+    margin-bottom: 32px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    position: relative;
+  }
+
+  .question-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 2px;
+    background: var(--border);
+    transition: background 0.3s;
+  }
+
+  .question-card.correct::before { background: var(--accent); }
+  .question-card.wrong::before { background: var(--accent2); }
+
+  .q-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .q-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 2px 8px;
+    min-width: 32px;
+    text-align: center;
+  }
+
+  .q-title {
+    font-size: 14px;
+    font-weight: 600;
+    flex: 1;
+  }
+
+  .q-marks {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .q-desc {
+    padding: 16px 20px;
+    font-size: 13px;
+    color: #aaa;
+    border-bottom: 1px solid var(--border);
+    line-height: 1.7;
+  }
+
+  .q-desc code {
+    font-family: var(--mono);
+    background: var(--bg);
+    padding: 2px 6px;
+    border: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--accent);
+  }
+
+  /* PREVIEW + EDITOR LAYOUT */
+  .q-workspace {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 220px;
+  }
+
+  .q-editor-pane {
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .pane-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 8px 14px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+  }
+
+  textarea.code-input {
+    flex: 1;
+    width: 100%;
+    min-height: 180px;
+    background: #0d0d0d;
+    border: none;
+    color: #c9d1d9;
+    font-family: var(--mono);
+    font-size: 13px;
+    padding: 14px;
+    resize: vertical;
+    outline: none;
+    tab-size: 2;
+    line-height: 1.6;
+  }
+
+  textarea.code-input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .q-preview-pane { display: flex; flex-direction: column; }
+
+  .preview-frame {
+    flex: 1;
+    border: none;
+    background: #fff;
+    min-height: 180px;
+    width: 100%;
+  }
+
+  .q-footer {
+    padding: 10px 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .btn-run {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 6px 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn-run:hover { border-color: var(--accent); color: var(--accent); }
+
+  .q-result {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 4px 10px;
+    display: none;
+  }
+
+  .q-result.pass { color: var(--accent); display: block; }
+  .q-result.fail { color: var(--accent2); display: block; }
+
+  /* RESULT SCREEN */
+  #screen-result {
+    align-items: center;
+    justify-content: center;
+    background:
+      radial-gradient(ellipse 50% 40% at 50% 30%, #00ff8808, transparent),
+      var(--bg);
+  }
+
+  .result-box {
+    max-width: 480px;
+    width: 100%;
+    padding: 48px 40px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    text-align: center;
+    position: relative;
+  }
+
+  .result-box::before {
+    content: '';
+    position: absolute;
+    top: -1px; left: 50%; transform: translateX(-50%);
+    width: 80px; height: 2px;
+    background: var(--accent);
+  }
+
+  .score-display {
+    font-family: var(--mono);
+    font-size: 72px;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+    margin: 24px 0 8px;
+  }
+
+  .score-label {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+
+  .score-breakdown {
+    border: 1px solid var(--border);
+    padding: 16px;
+    text-align: left;
+    margin-bottom: 24px;
+  }
+
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 4px 0;
+    border-bottom: 1px solid #1a1a1a;
+  }
+
+  .breakdown-row:last-child { border-bottom: none; }
+  .breakdown-row .label { color: var(--muted); }
+  .breakdown-row .val { color: var(--text); }
+  .breakdown-row .val.green { color: var(--accent); }
+  .breakdown-row .val.red { color: var(--accent2); }
+
+  .status-msg {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 16px;
+  }
+
+  .status-msg.ok { color: var(--accent); }
+  .status-msg.err { color: var(--accent2); }
+
+  /* ANTI-CHEAT OVERLAY */
+  #cheat-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: #000000ee;
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 16px;
+    font-family: var(--mono);
+  }
+
+  #cheat-overlay.show { display: flex; }
+
+  .cheat-title {
+    font-size: 18px;
+    color: var(--accent2);
+    font-weight: 700;
+    letter-spacing: 2px;
+  }
+
+  .cheat-msg { color: var(--muted); font-size: 12px; text-align: center; max-width: 300px; }
+
+  .tab-counter {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: var(--mono);
+  }
+
+  /* SPINNER */
+  .spinner {
+    display: inline-block;
+    width: 16px; height: 16px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: middle;
+    margin-right: 8px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @media (max-width: 700px) {
+    .q-workspace { grid-template-columns: 1fr; }
+    .q-editor-pane { border-right: none; border-bottom: 1px solid var(--border); }
+    .exam-header { flex-wrap: wrap; gap: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ───── LOGIN SCREEN ───── -->
+<div id="screen-login" class="screen active">
+  <div class="login-box">
+    <div class="brand">◆ Exam Portal</div>
+    <h1>Frontend Assessment</h1>
+    <p class="subtitle">Enter your credentials to begin the exam.</p>
+
+    <label for="inp-name">Full Name</label>
+    <input type="text" id="inp-name" placeholder="Your full name" autocomplete="off">
+
+    <label for="inp-token">Access Token</label>
+    <input type="password" id="inp-token" placeholder="Provided by instructor" autocomplete="off">
+
+    <div class="rules">
+      <span>Rules:</span><br>
+      ▸ 5 questions · 30 minutes · Best 3 of 5 counted<br>
+      ▸ Each question = 10 marks · Total = 30<br>
+      ▸ No tab switching · No right-click · No DevTools<br>
+      ▸ Submit before timer ends · Token is one-time use
+    </div>
+
+    <button class="btn btn-primary" id="btn-start" onclick="ExamApp.startExam()">
+      Verify & Start Exam
+    </button>
+    <div class="error-msg" id="login-error"></div>
+  </div>
+</div>
+
+<!-- ───── EXAM SCREEN ───── -->
+<div id="screen-exam" class="screen">
+  <div class="exam-header">
+    <div class="exam-meta">
+      <strong id="hdr-name">—</strong>
+      &nbsp;·&nbsp;
+      Token: <strong id="hdr-token">—</strong>
+    </div>
+    <div id="timer">30:00</div>
+    <div class="exam-actions">
+      <span class="tab-counter" id="tab-warn"></span>
+      <button class="btn btn-danger" onclick="ExamApp.confirmSubmit()" id="btn-submit">
+        Submit
+      </button>
+    </div>
+  </div>
+
+  <div class="exam-body">
+    <div class="set-badge" id="set-label">Loading...</div>
+    <div id="questions-container"></div>
+  </div>
+</div>
+
+<!-- ───── RESULT SCREEN ───── -->
+<div id="screen-result" class="screen">
+  <div class="result-box">
+    <div class="brand">◆ Exam Complete</div>
+    <div class="score-display" id="final-score">—</div>
+    <div class="score-label">out of 30 marks</div>
+
+    <div class="score-breakdown" id="score-breakdown"></div>
+
+    <div class="status-msg" id="submit-status">Submitting results...</div>
+  </div>
+</div>
+
+<!-- ───── ANTI-CHEAT OVERLAY ───── -->
+<div id="cheat-overlay">
+  <div class="cheat-title">⚠ TAB SWITCH DETECTED</div>
+  <div class="cheat-msg">You left the exam tab. This has been recorded. Click below to return.</div>
+  <button class="btn btn-danger" onclick="AntiCheat.dismiss()">Return to Exam</button>
+</div>
+
+<script src="config.js"></script>
+<script src="questions.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
