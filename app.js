@@ -5,7 +5,7 @@
  * ─────────────────────────────────────────────────────────
  */
 
-'use strict';
+"use strict";
 
 // ═══════════════════════════════════════════════════════════
 // ANTI-CHEAT MODULE
@@ -13,26 +13,26 @@
 const AntiCheat = (() => {
   let tabSwitches = 0;
   let examStarted = false;
-  let dismissed   = false;
+  let dismissed = false;
 
   function init() {
     examStarted = true;
 
     // Right-click
     if (ExamConfig.DISABLE_RIGHTCLICK) {
-      document.addEventListener('contextmenu', e => e.preventDefault());
+      document.addEventListener("contextmenu", (e) => e.preventDefault());
     }
 
     // Copy/paste
     if (ExamConfig.DISABLE_COPY) {
-      document.addEventListener('copy',  e => e.preventDefault());
-      document.addEventListener('paste', e => e.preventDefault());
-      document.addEventListener('cut',   e => e.preventDefault());
+      document.addEventListener("copy", (e) => e.preventDefault());
+      document.addEventListener("paste", (e) => e.preventDefault());
+      document.addEventListener("cut", (e) => e.preventDefault());
     }
 
     // Tab visibility
-    document.addEventListener('visibilitychange', () => {
-      if (!examStarted || document.visibilityState !== 'hidden') return;
+    document.addEventListener("visibilitychange", () => {
+      if (!examStarted || document.visibilityState !== "hidden") return;
       tabSwitches++;
       _updateTabWarn();
       if (tabSwitches >= ExamConfig.MAX_TAB_SWITCHES) {
@@ -48,61 +48,67 @@ const AntiCheat = (() => {
     }
 
     // Keyboard shortcuts block
-    document.addEventListener('keydown', e => {
+    document.addEventListener("keydown", (e) => {
       // Block F12
-      if (e.key === 'F12') e.preventDefault();
+      if (e.key === "F12") e.preventDefault();
       // Block Ctrl+Shift+I/J/C
-      if (e.ctrlKey && e.shiftKey && ['I','J','C','i','j','c'].includes(e.key)) e.preventDefault();
+      if (
+        e.ctrlKey &&
+        e.shiftKey &&
+        ["I", "J", "C", "i", "j", "c"].includes(e.key)
+      )
+        e.preventDefault();
       // Block Ctrl+U (view source)
-      if (e.ctrlKey && ['u','U'].includes(e.key)) e.preventDefault();
+      if (e.ctrlKey && ["u", "U"].includes(e.key)) e.preventDefault();
     });
   }
 
   function _detectDevtools() {
     const threshold = 160;
-    if (window.outerWidth - window.innerWidth > threshold ||
-        window.outerHeight - window.innerHeight > threshold) {
+    if (
+      window.outerWidth - window.innerWidth > threshold ||
+      window.outerHeight - window.innerHeight > threshold
+    ) {
       ExamState.devtoolsOpened = true;
     }
   }
 
   function _updateTabWarn() {
-    const el = document.getElementById('tab-warn');
+    const el = document.getElementById("tab-warn");
     if (!el) return;
     el.textContent = `Tab switches: ${tabSwitches}/${ExamConfig.MAX_TAB_SWITCHES}`;
-    el.style.color = tabSwitches >= ExamConfig.MAX_TAB_SWITCHES - 1 ? '#ff3366' : '#555';
+    el.style.color =
+      tabSwitches >= ExamConfig.MAX_TAB_SWITCHES - 1 ? "#ff3366" : "#555";
   }
 
   function _showOverlay() {
-    document.getElementById('cheat-overlay').classList.add('show');
+    document.getElementById("cheat-overlay").classList.add("show");
   }
 
   function dismiss() {
-    document.getElementById('cheat-overlay').classList.remove('show');
+    document.getElementById("cheat-overlay").classList.remove("show");
   }
 
   return { init, dismiss };
 })();
 
-
 // ═══════════════════════════════════════════════════════════
 // EXAM STATE
 // ═══════════════════════════════════════════════════════════
 const ExamState = {
-  studentName:   '',
-  token:         '',
-  tokenHash:     '',
-  setId:         '',
-  questions:     [],
-  startTime:     null,
-  endTime:       null,
-  submitted:     false,
-  timerHandle:   null,
-  tabSwitches:   0,
+  studentName: "",
+  token: "",
+  tokenHash: "",
+  setId: "",
+  questions: [],
+  startTime: null,
+  endTime: null,
+  submitted: false,
+  timerHandle: null,
+  tabSwitches: 0,
   devtoolsOpened: false,
-  scores:        {},   // { qId: 10|0 }
+  scores: {}, // { qId: 10|0 }
 };
-
 
 // ═══════════════════════════════════════════════════════════
 // TIMER MODULE
@@ -130,36 +136,37 @@ const Timer = (() => {
   }
 
   function _render(ms) {
-    const el  = document.getElementById('timer');
-    const s   = Math.max(0, Math.floor(ms / 1000));
-    const m   = Math.floor(s / 60);
+    const el = document.getElementById("timer");
+    const s = Math.max(0, Math.floor(ms / 1000));
+    const m = Math.floor(s / 60);
     const sec = s % 60;
-    el.textContent = `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
-    el.className = s > 300 ? '' : s > 60 ? 'warn' : 'danger';
+    el.textContent = `${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
+    el.className = s > 300 ? "" : s > 60 ? "warn" : "danger";
   }
 
   return { start, stop };
 })();
 
-
 // ═══════════════════════════════════════════════════════════
 // EVALUATION ENGINE
 // ═══════════════════════════════════════════════════════════
 const Evaluator = (() => {
-
   // Run student code inside a sandboxed iframe and evaluate
   async function evaluateQuestion(q, studentCode) {
     return new Promise((resolve) => {
       try {
         // Create a hidden iframe sandbox
-        const iframe = document.createElement('iframe');
-        iframe.style.cssText = 'position:absolute;left:-9999px;top:-9999px;width:800px;height:600px;';
-        iframe.sandbox = 'allow-scripts allow-same-origin';
+        const iframe = document.createElement("iframe");
+        iframe.style.cssText =
+          "position:absolute;left:-9999px;top:-9999px;width:800px;height:600px;";
+        iframe.sandbox = "allow-scripts allow-same-origin";
         document.body.appendChild(iframe);
 
         const iDoc = iframe.contentDocument || iframe.contentWindow.document;
         iDoc.open();
-        iDoc.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>${studentCode}</body></html>`);
+        iDoc.write(
+          `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>${studentCode}</body></html>`,
+        );
         iDoc.close();
 
         // Small delay to allow scripts to run
@@ -167,15 +174,17 @@ const Evaluator = (() => {
           let result;
           try {
             result = q.validate(iDoc);
-          } catch(err) {
-            result = { pass: false, feedback: 'Validation error: ' + err.message };
+          } catch (err) {
+            result = {
+              pass: false,
+              feedback: "Validation error: " + err.message,
+            };
           }
           document.body.removeChild(iframe);
           resolve(result);
         }, 150);
-
-      } catch(err) {
-        resolve({ pass: false, feedback: 'Sandbox error: ' + err.message });
+      } catch (err) {
+        resolve({ pass: false, feedback: "Sandbox error: " + err.message });
       }
     });
   }
@@ -187,7 +196,7 @@ const Evaluator = (() => {
 
     for (const q of qs) {
       const ta = document.getElementById(`code-${q.id}`);
-      const code = ta ? ta.value.trim() : '';
+      const code = ta ? ta.value.trim() : "";
       const result = await evaluateQuestion(q, code);
       ExamState.scores[q.id] = result.pass ? ExamConfig.MARKS_PER_QUESTION : 0;
       results.push({ q, result });
@@ -195,9 +204,9 @@ const Evaluator = (() => {
 
     // Best N of 5
     const marks = Object.values(ExamState.scores);
-    const sorted = [...marks].sort((a,b) => b - a);
-    const bestN  = sorted.slice(0, ExamConfig.BEST_N_QUESTIONS);
-    const total  = bestN.reduce((s,v) => s+v, 0);
+    const sorted = [...marks].sort((a, b) => b - a);
+    const bestN = sorted.slice(0, ExamConfig.BEST_N_QUESTIONS);
+    const total = bestN.reduce((s, v) => s + v, 0);
 
     return { results, total, marks };
   }
@@ -205,70 +214,127 @@ const Evaluator = (() => {
   return { evaluateQuestion, evaluateAll };
 })();
 
-
 // ═══════════════════════════════════════════════════════════
 // GOOGLE SHEETS SUBMISSION
 // ═══════════════════════════════════════════════════════════
 const Submission = (() => {
-
   async function submit(total, results) {
     const payload = {
-      name:        ExamState.studentName,
-      token:       ExamState.token,
-      tokenHash:   ExamState.tokenHash,
-      score:       total,
-      setId:       ExamState.setId,
-      details:     JSON.stringify(
-        results.map(r => ({ id: r.q.id, pass: r.result.pass, marks: ExamState.scores[r.q.id] }))
+      name: ExamState.studentName,
+      token: ExamState.token,
+      tokenHash: ExamState.tokenHash,
+      score: total,
+      setId: ExamState.setId,
+      details: JSON.stringify(
+        results.map((r) => ({
+          id: r.q.id,
+          pass: r.result.pass,
+          marks: ExamState.scores[r.q.id],
+        })),
       ),
       tabSwitches: ExamState.tabSwitches,
-      devtools:    ExamState.devtoolsOpened,
-      timestamp:   new Date().toISOString(),
-      duration:    Math.round((Date.now() - ExamState.startTime) / 1000),
+      devtools: ExamState.devtoolsOpened,
+      timestamp: new Date().toISOString(),
+      duration: Math.round((Date.now() - ExamState.startTime) / 1000),
     };
 
+    // GAS requires the data sent as a URL query string via GET,
+    // OR as a form POST. We use an invisible form POST (no-cors safe).
     try {
-      const res = await fetch(ExamConfig.APPS_SCRIPT_URL, {
-        method: 'POST',
-        mode:   'no-cors',       // GAS requires no-cors for cross-origin POST
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
+      // Method 1: form submission via hidden iframe (most reliable with GAS)
+      await _formPost(ExamConfig.APPS_SCRIPT_URL, payload);
       return { ok: true };
-    } catch(err) {
-      console.error('Submission failed:', err);
-      return { ok: false, error: err.message };
+    } catch (err) {
+      console.error("Submission failed:", err);
+      // Method 2: fallback GET with data in URL params
+      try {
+        await _getRequest(ExamConfig.APPS_SCRIPT_URL, payload);
+        return { ok: true };
+      } catch (err2) {
+        return { ok: false, error: err2.message };
+      }
     }
+  }
+
+  // Send data via a hidden form POST into a hidden iframe
+  // This bypasses CORS entirely — browser posts, GAS receives
+  function _formPost(url, data) {
+    return new Promise((resolve) => {
+      const iframe = document.createElement("iframe");
+      iframe.name = "hidden_submit_" + Date.now();
+      iframe.style.cssText = "display:none;position:absolute;";
+      document.body.appendChild(iframe);
+
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = url;
+      form.target = iframe.name;
+      form.style.display = "none";
+
+      // Add each field as a hidden input
+      Object.entries(data).forEach(([key, value]) => {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = key;
+        input.value = String(value);
+        form.appendChild(input);
+      });
+
+      document.body.appendChild(form);
+      form.submit();
+
+      // GAS processes async — wait 4s then resolve
+      setTimeout(() => {
+        try {
+          document.body.removeChild(form);
+        } catch (e) {}
+        try {
+          document.body.removeChild(iframe);
+        } catch (e) {}
+        resolve({ ok: true });
+      }, 4000);
+    });
+  }
+
+  // Fallback: GET request with params (GAS doGet must handle this)
+  function _getRequest(url, data) {
+    return new Promise((resolve, reject) => {
+      const params = new URLSearchParams(data).toString();
+      const img = new Image();
+      img.onload = img.onerror = () => resolve({ ok: true });
+      img.src = `${url}?${params}`;
+      setTimeout(() => resolve({ ok: true }), 5000);
+    });
   }
 
   return { submit };
 })();
 
-
 // ═══════════════════════════════════════════════════════════
 // SCREEN MANAGER
 // ═══════════════════════════════════════════════════════════
 function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-' + id).classList.add('active');
+  document
+    .querySelectorAll(".screen")
+    .forEach((s) => s.classList.remove("active"));
+  document.getElementById("screen-" + id).classList.add("active");
 }
-
 
 // ═══════════════════════════════════════════════════════════
 // EXAM RENDERER
 // ═══════════════════════════════════════════════════════════
 function renderQuestions(questions) {
-  const container = document.getElementById('questions-container');
-  container.innerHTML = '';
+  const container = document.getElementById("questions-container");
+  container.innerHTML = "";
 
   questions.forEach((q, i) => {
-    const card = document.createElement('div');
-    card.className = 'question-card';
+    const card = document.createElement("div");
+    card.className = "question-card";
     card.id = `qcard-${q.id}`;
 
     card.innerHTML = `
       <div class="q-header">
-        <div class="q-num">Q${i+1}</div>
+        <div class="q-num">Q${i + 1}</div>
         <div class="q-title">${q.title}</div>
         <div class="q-marks">10 marks</div>
       </div>
@@ -296,63 +362,62 @@ function renderQuestions(questions) {
   });
 }
 
-
 // ═══════════════════════════════════════════════════════════
 // RESULT RENDERER
 // ═══════════════════════════════════════════════════════════
 function renderResult(total, results) {
-  document.getElementById('final-score').textContent = total;
+  document.getElementById("final-score").textContent = total;
 
-  const bd = document.getElementById('score-breakdown');
-  let html = '';
+  const bd = document.getElementById("score-breakdown");
+  let html = "";
   results.forEach((r, i) => {
     const m = ExamState.scores[r.q.id];
     html += `
       <div class="breakdown-row">
-        <span class="label">Q${i+1}: ${r.q.title}</span>
-        <span class="val ${r.result.pass ? 'green' : 'red'}">${m} / 10 — ${r.result.feedback}</span>
+        <span class="label">Q${i + 1}: ${r.q.title}</span>
+        <span class="val ${r.result.pass ? "green" : "red"}">${m} / 10 — ${r.result.feedback}</span>
       </div>`;
   });
 
   // Show which questions were counted
   const sortedIds = [...ExamState.questions]
-    .sort((a,b) => (ExamState.scores[b.id]||0) - (ExamState.scores[a.id]||0))
+    .sort(
+      (a, b) => (ExamState.scores[b.id] || 0) - (ExamState.scores[a.id] || 0),
+    )
     .slice(0, ExamConfig.BEST_N_QUESTIONS)
-    .map(q => q.id);
+    .map((q) => q.id);
 
   html += `
     <div class="breakdown-row" style="margin-top:8px;border-top:1px solid #333;padding-top:8px;">
       <span class="label">Best ${ExamConfig.BEST_N_QUESTIONS} counted</span>
-      <span class="val">${sortedIds.join(', ')}</span>
+      <span class="val">${sortedIds.join(", ")}</span>
     </div>
     <div class="breakdown-row">
       <span class="label">Tab switches</span>
-      <span class="val ${ExamState.tabSwitches > 0 ? 'red' : 'green'}">${ExamState.tabSwitches}</span>
+      <span class="val ${ExamState.tabSwitches > 0 ? "red" : "green"}">${ExamState.tabSwitches}</span>
     </div>`;
 
   bd.innerHTML = html;
 }
 
-
 // ═══════════════════════════════════════════════════════════
 // MAIN EXAM APP
 // ═══════════════════════════════════════════════════════════
 const ExamApp = {
-
   // ── Start Exam ────────────────────────────────────────
   async startExam() {
-    const nameEl  = document.getElementById('inp-name');
-    const tokenEl = document.getElementById('inp-token');
-    const errEl   = document.getElementById('login-error');
-    const btn     = document.getElementById('btn-start');
+    const nameEl = document.getElementById("inp-name");
+    const tokenEl = document.getElementById("inp-token");
+    const errEl = document.getElementById("login-error");
+    const btn = document.getElementById("btn-start");
 
-    const name  = nameEl.value.trim();
+    const name = nameEl.value.trim();
     const token = tokenEl.value.trim();
 
-    errEl.style.display = 'none';
+    errEl.style.display = "none";
 
-    if (!name) return _loginError('Please enter your full name.');
-    if (!token) return _loginError('Please enter your access token.');
+    if (!name) return _loginError("Please enter your full name.");
+    if (!token) return _loginError("Please enter your access token.");
 
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner"></span>Verifying...';
@@ -362,16 +427,18 @@ const ExamApp = {
 
     if (!valid) {
       btn.disabled = false;
-      btn.textContent = 'Verify & Start Exam';
-      return _loginError('Invalid token. Contact your instructor.');
+      btn.textContent = "Verify & Start Exam";
+      return _loginError("Invalid token. Contact your instructor.");
     }
 
     // Check if already submitted (localStorage guard)
     const usedKey = `exam_used_${hash}`;
     if (localStorage.getItem(usedKey)) {
       btn.disabled = false;
-      btn.textContent = 'Verify & Start Exam';
-      return _loginError('This token has already been used. Duplicate submissions are not allowed.');
+      btn.textContent = "Verify & Start Exam";
+      return _loginError(
+        "This token has already been used. Duplicate submissions are not allowed.",
+      );
     }
 
     // Optional: server-side token check
@@ -390,9 +457,9 @@ const ExamApp = {
 
     // Assign state
     ExamState.studentName = name;
-    ExamState.token       = token.toUpperCase();
-    ExamState.tokenHash   = hash;
-    ExamState.startTime   = Date.now();
+    ExamState.token = token.toUpperCase();
+    ExamState.tokenHash = hash;
+    ExamState.startTime = Date.now();
 
     // Pick random set
     const sets = QuestionSets.SETS;
@@ -400,13 +467,15 @@ const ExamApp = {
     ExamState.questions = QuestionSets[ExamState.setId];
 
     // Update header
-    document.getElementById('hdr-name').textContent  = name;
-    document.getElementById('hdr-token').textContent = token.slice(0,8) + '···';
-    document.getElementById('set-label').textContent = `Set ${ExamState.setId} · ${ExamState.questions.length} Questions`;
+    document.getElementById("hdr-name").textContent = name;
+    document.getElementById("hdr-token").textContent =
+      token.slice(0, 8) + "···";
+    document.getElementById("set-label").textContent =
+      `Set ${ExamState.setId} · ${ExamState.questions.length} Questions`;
 
     // Render
     renderQuestions(ExamState.questions);
-    showScreen('exam');
+    showScreen("exam");
 
     // Start anti-cheat & timer
     AntiCheat.init();
@@ -414,25 +483,27 @@ const ExamApp = {
 
     function _loginError(msg) {
       errEl.textContent = msg;
-      errEl.style.display = 'block';
+      errEl.style.display = "block";
     }
   },
 
   // ── Run live preview ──────────────────────────────────
   runPreview(qId) {
-    const ta     = document.getElementById(`code-${qId}`);
+    const ta = document.getElementById(`code-${qId}`);
     const iframe = document.getElementById(`preview-${qId}`);
     if (!ta || !iframe) return;
     const doc = iframe.contentDocument || iframe.contentWindow.document;
     doc.open();
-    doc.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{margin:8px;font-family:sans-serif;font-size:13px;}</style></head><body>${ta.value}</body></html>`);
+    doc.write(
+      `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{margin:8px;font-family:sans-serif;font-size:13px;}</style></head><body>${ta.value}</body></html>`,
+    );
     doc.close();
   },
 
   // ── Manual submit ─────────────────────────────────────
   confirmSubmit() {
     if (ExamState.submitted) return;
-    if (!confirm('Submit your exam now? This cannot be undone.')) return;
+    if (!confirm("Submit your exam now? This cannot be undone.")) return;
     this._doSubmit();
   },
 
@@ -446,33 +517,37 @@ const ExamApp = {
   async _doSubmit(auto = false) {
     if (ExamState.submitted) return;
     ExamState.submitted = true;
-    ExamState.endTime   = Date.now();
+    ExamState.endTime = Date.now();
 
     // Lock all textareas
-    document.querySelectorAll('textarea.code-input').forEach(ta => {
+    document.querySelectorAll("textarea.code-input").forEach((ta) => {
       ta.disabled = true;
     });
 
     // Disable submit button
-    const submitBtn = document.getElementById('btn-submit');
-    if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Submitted'; }
+    const submitBtn = document.getElementById("btn-submit");
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Submitted";
+    }
     Timer.stop();
 
-    showScreen('result');
-    document.getElementById('submit-status').textContent = 'Evaluating your answers...';
-    document.getElementById('submit-status').className = 'status-msg';
+    showScreen("result");
+    document.getElementById("submit-status").textContent =
+      "Evaluating your answers...";
+    document.getElementById("submit-status").className = "status-msg";
 
     // Evaluate
     const { results, total } = await Evaluator.evaluateAll();
 
     // Render result
     renderResult(total, results);
-    document.getElementById('final-score').textContent = total;
+    document.getElementById("final-score").textContent = total;
 
     // Mark question cards
-    results.forEach(r => {
+    results.forEach((r) => {
       const card = document.getElementById(`qcard-${r.q.id}`);
-      if (card) card.classList.add(r.result.pass ? 'correct' : 'wrong');
+      if (card) card.classList.add(r.result.pass ? "correct" : "wrong");
     });
 
     // Mark token used locally
@@ -480,26 +555,28 @@ const ExamApp = {
     localStorage.setItem(usedKey, Date.now().toString());
 
     // Submit to Google Sheets
-    document.getElementById('submit-status').textContent = 'Submitting results to server...';
+    document.getElementById("submit-status").textContent =
+      "Submitting results to server...";
     const submitResult = await Submission.submit(total, results);
 
-    const statusEl = document.getElementById('submit-status');
+    const statusEl = document.getElementById("submit-status");
     if (submitResult.ok) {
-      statusEl.textContent = '✓ Results submitted successfully.';
-      statusEl.className = 'status-msg ok';
+      statusEl.textContent = "✓ Results submitted successfully.";
+      statusEl.className = "status-msg ok";
     } else {
-      statusEl.textContent = '⚠ Could not reach server. Screenshot this page and send to instructor.';
-      statusEl.className = 'status-msg err';
+      statusEl.textContent =
+        "⚠ Could not reach server. Screenshot this page and send to instructor.";
+      statusEl.className = "status-msg err";
     }
-  }
+  },
 };
 
 // ── Global error for login  ───────────────────────────────
 function _loginError(msg) {
-  const errEl = document.getElementById('login-error');
+  const errEl = document.getElementById("login-error");
   errEl.textContent = msg;
-  errEl.style.display = 'block';
-  const btn = document.getElementById('btn-start');
+  errEl.style.display = "block";
+  const btn = document.getElementById("btn-start");
   btn.disabled = false;
-  btn.textContent = 'Verify & Start Exam';
+  btn.textContent = "Verify & Start Exam";
 }
