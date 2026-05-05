@@ -1,67 +1,83 @@
-/**
- * config.js
- * ─────────────────────────────────────────────────────────
- * EXAM CONFIGURATION — Edit before each exam session.
- * ─────────────────────────────────────────────────────────
- *
- * TOKEN SECURITY NOTE:
- *   Tokens are hashed (SHA-256) so raw tokens are never in source.
- *   Generate hashes using: ExamConfig.hashToken("RAW_TOKEN")
- *   in browser console, then paste the hash here.
- *
- *   Raw tokens you distribute to students (examples):
- *     ALPHA-2024-001  →  hash below
- *     ALPHA-2024-002  →  hash below
- *   Replace with your real hashed tokens before deployment.
- */
-
 const ExamConfig = {
-
-  // ── Exam settings ──────────────────────────────────────
   EXAM_DURATION_MINUTES: 30,
   QUESTIONS_PER_SET: 5,
   MARKS_PER_QUESTION: 10,
-  BEST_N_QUESTIONS: 3,          // Best 3 of 5 counted
+  BEST_N_QUESTIONS: 3,
 
-  // ── Google Apps Script endpoint ────────────────────────
-  // Replace with your deployed Apps Script Web App URL
-VALID_TOKEN_HASHES: new Set([
-    '6026f9bf9a6ec39abf9fe1cfa785e0e4119169efe8a6b3516c3d86c0161e4307',
-    '71d5925972a25effca9caa76a2a90c2cf560652e4157d02c68a3eb0202c94b8e',
-    // ... all 50 hashes ...
-]),
+  APPS_SCRIPT_URL:
+    "https://script.google.com/macros/s/AKfycbwa1aQMVuegKop1b-U21HGcCMhi5GZcBakdP7h-dnUkxvA1-eYO3LLB2ec3EKUCkutU/exec",
 
-  // ── Hashed token list (SHA-256 hex, lowercase) ─────────
-  // To generate: open browser console → ExamConfig.hashToken("TOKEN")
-  // Format: { hash: true/false }  (false = already used, set via GAS)
   VALID_TOKEN_HASHES: new Set([
-    // paste SHA-256 hashes of your tokens here, one per line
-    // example (hash of "ALPHA-2024-001"):
-    'a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2',
-    'b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3',
-    'c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4',
-    // ... add more hashes for all students
+    "6026f9bf9a6ec39abf9fe1cfa785e0e4119169efe8a6b3516c3d86c0161e4307",
+    "71d5925972a25effca9caa76a2a90c2cf560652e4157d02c68a3eb0202c94b8e",
+    "faf96ee09c749955f8f34561a7523e66c65907e2469836839ced49e70a98562b",
+    "d2a09320325e2f65daf8d59fc2009348dcdcd0bfb0894dfa4b8905de4ed1d28e",
+    "abdf8ed040b2668b040ed8c506f602e779b007bdf3ba8ac0f1d66c09d4d1a51a",
+    "db59d3fc70c6e4257870d7f1f3567b95252d7d1bff72ac90f02f5a3936bd91a4",
+    "ba8cc79f51ba4f1ad3fbce64a44da46efc9f42069d7379d409c78dc033c53924",
+    "1c67acff2d29d08e2f30dd347f38cc35ead42b53c3b637982b9908e255b10a87",
+    "fc79ce2aaa039f02a9314c80dc8f6e2715a9f108b7a006db6044ac6f5b1be9cb",
+    "f8c8f0a4f02e68e11d941850ccafb42e162ce09b0359cd01368341435f440e95",
+    "11444b88afa5795861843875108969c01c8e4c0a528c86e5dfe0cef6e87bdfdf",
+    "ca42ff38e71bf6c50172b4fd01c4f2a6e61ffec6668b4e45d6c919a2d0c6a4dc",
+    "def08240edb5add7b1b1573493b0c56d739b2bd00e33a3ac3b459f0bac0ca717",
+    "5c8e602e22584d56855d924fe5ebc3f1ca6641b0c602f37d47aff3a7dbd017ff",
+    "8fc5d5ff7edd63661a549587c7cadcd0d733a0fca9a70e3d169f609e2a9039ef",
+    "39a6989ce08fffd4d2de82202c024da192c4402256e793ad191aeef3f7527df6",
+    "753726688a33f51093f86269a2b0c9c56a1c0ce99818d7fd63788a9422c88883",
+    "3a42b4e23f0fd80c77326f6ee062827e5fdf36d682d987b773d2ea2475598db6",
+    "a67b6bb206fe110eb5758bcda144da38be07d6e86208e759cfb953d695ae6284",
+    "ac17f8b3ba73ff0c6187ccdf835a1dcde681fce9aceac7e32016354c6943257f",
+    "4c243cacfcd5e33342fad97fcea645c90540a6824a4f8428e850aaeb933ba529",
+    "ad944536e4df2ff828894b1f3d308982849f1eeefac4639b87c8d33629d2424c",
+    "5167a64552257c160f51174445c0840f31cb9c8d4b96f78b9909be0d589e6c1e",
+    "354bf5b185ddc1ce629b212328d43ffed9edb395ceba5175a7c414c4b0dd82f2",
+    "701bf6bf609ae3e79575bc0a98a61aa854aef064325495015a53819b20a5acae",
+    "44aa5497d3412acf0623ad697a9542b9e019c99c649660d0dd25e0bb70e799a5",
+    "d6d0c1777bf8511714754283e6f2ea85b0692c1721231c2ec08efcd1887a9175",
+    "bda31c58b137f66403205219e972101f53667f27c9623e558d380c061f1b748a",
+    "e557806f98e02b5051b21b579ca84a153a4359449a878ea062f9276021356e13",
+    "1c800d1de454ddffbf03361a8e2820f15967cea2dbae4158a8c1bb08384be14e",
+    "4ba7dbe23d743cbe166ddb41d4e591d5837b5dd99d9404574315edca9a14fcb8",
+    "521a05f969ffd641170f89b4f1cbe207fd6c787889791a3bd248b0a042200868",
+    "a4c63cb93fc2b6f953e5b254fd2cc82312e28f02f72a7ab8b6283c8a7b81fb05",
+    "2822323938cb0bd99450c1cc3a792459d294c591ad47962725cdb7895ab13a60",
+    "0258ca2938c65ec15f98b1596efddc567300b8fd720c53132aff2eb53c962e7d",
+    "dd799e3f127b546dc1765b8927de932b39ecd67050e528c29ebefe1edfd179e8",
+    "c12f6d0dc914dce9562d6fce6565e65bd413b0430659585fc36c581a8efd80c7",
+    "af5c8c73a41a6159683ff13d8e377ab6964f9c925107483c4dd5b144670e9e58",
+    "04aa4fe1386dafaff1acf7f2c4e86f065d76d8515e584b3c382e7fc3057604b7",
+    "4cafa5cdb7dfea70a3b95f4f0fd2e024f57f66feca072043d2dfbf7246406e1c",
+    "184144218e55450f3f9639cf6bf5b5bb13a099f317cc67fdb812549be12f4eb6",
+    "1ed9be9ac9c5a15931d2285b0476b2d9de94b98318c44661a6671eac9b6050b8",
+    "355a2625c9633eea75b0ffcfaf9f6b1e44fcdfdca0939084b71cfe622ff3ceef",
+    "dd05c4bbb217cdd0495a462d007bcb151a593203ccea0c0ffcf58948be100c3f",
+    "4676a6c974689ae6e9dde478836ca617b74f02fc26dd982955a7f170b2fcc172",
+    "18d924a216c2777e5ca02701ff094eada265344933e8c55b3f0ec21882167d3e",
+    "aadbce2337234cab2de0b6850c0f75cd4aa4dbeb8c60720f7dd45c28875b1adf",
+    "0b680abbb3ce67c741fcdd6c2b79287b2922bf0e3b23d10a21dcdb3cd93920b2",
+    "1ae8ec2d57f7f94fb258da6e32dced2626e7ad1875cebc1a0780300746d9a6e3",
+    "fe43428f8d679c934a852ebf531d76f5d6f7ea441dd513afd619e5ca89804338",
   ]),
 
-  // ── Anti-cheat settings ────────────────────────────────
-  MAX_TAB_SWITCHES: 3,          // Warn after N switches, then lock
+  MAX_TAB_SWITCHES: 3,
   DISABLE_RIGHTCLICK: true,
-  DISABLE_COPY: false,          // Set true to block copy/paste
+  DISABLE_COPY: false,
   DETECT_DEVTOOLS: true,
 
-  // ── Utility: hash a raw token (run in console) ─────────
   async hashToken(raw) {
     const enc = new TextEncoder().encode(raw.trim().toUpperCase());
-    const buf = await crypto.subtle.digest('SHA-256', enc);
-    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+    const buf = await crypto.subtle.digest("SHA-256", enc);
+    return Array.from(new Uint8Array(buf))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
   },
 
-  // ── Validate token against hash set ───────────────────
   async validateToken(raw) {
     const hash = await this.hashToken(raw);
     return {
       valid: this.VALID_TOKEN_HASHES.has(hash),
-      hash
+      hash,
     };
-  }
+  },
 };
