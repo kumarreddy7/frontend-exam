@@ -5,7 +5,7 @@ const ExamConfig = {
   BEST_N_QUESTIONS: 3,
 
   APPS_SCRIPT_URL:
-    "https://script.google.com/macros/s/AKfycbwa1aQMVuegKop1b-U21HGcCMhi5GZcBakdP7h-dnUkxvA1-eYO3LLB2ec3EKUCkutU/exec",
+    "https://script.google.com/macros/library/d/1wglre603gkUKmwTgnvh9qAO0V9zY8NouTTvlALDuKYBIJKg8cH_ZNsM-/3",
 
   VALID_TOKEN_HASHES: new Set([
     "c5f8781b3ab1682516b478aaf618ed059166c3b5eefbe18cc67ad250f5b3fcce",
