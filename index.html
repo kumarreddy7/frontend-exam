@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Frontend Coding Exam</title>
+<title>.NET Fullstack Exam</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Space+Grotesk:wght@300;400;600&display=swap');
 
@@ -522,7 +522,7 @@
 <div id="screen-login" class="screen active">
   <div class="login-box">
     <div class="brand">◆ Exam Portal</div>
-    <h1>Frontend Assessment</h1>
+    <h1>.NET Fullstack Assessment</h1>
     <p class="subtitle">Enter your credentials to begin the exam.</p>
 
     <label for="inp-name">Full Name</label>
@@ -533,8 +533,8 @@
 
     <div class="rules">
       <span>Rules:</span><br>
-      ▸ 5 questions · 30 minutes · Best 3 of 5 counted<br>
-      ▸ Each question = 10 marks · Total = 30<br>
+      ▸ 22 questions · 60 minutes<br>
+      ▸ 20 MCQs (1 mark each) · 2 Coding (15 marks each) · Total = 50<br>
       ▸ No tab switching · No right-click · No DevTools<br>
       ▸ Submit before timer ends · Token is one-time use
     </div>
@@ -574,7 +574,7 @@
   <div class="result-box">
     <div class="brand">◆ Exam Complete</div>
     <div class="score-display" id="final-score">—</div>
-    <div class="score-label">out of 30 marks</div>
+    <div class="score-label">out of 50 marks</div>
 
     <div class="score-breakdown" id="score-breakdown"></div>
 
@@ -588,6 +588,12 @@
   <div class="cheat-msg">You left the exam tab. This has been recorded. Click below to return.</div>
   <button class="btn btn-danger" onclick="AntiCheat.dismiss()">Return to Exam</button>
 </div>
+
+<!-- Monaco Editor Setup -->
+<script>var require = { paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs' } };</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs/loader.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs/editor/editor.main.nls.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs/editor/editor.main.js"></script>
 
 <script src="config.js"></script>
 <script src="questions.js"></script>

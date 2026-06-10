@@ -151,67 +151,44 @@ const Timer = (() => {
 // EVALUATION ENGINE
 // ═══════════════════════════════════════════════════════════
 const Evaluator = (() => {
-  // Run student code inside a sandboxed iframe and evaluate
-  async function evaluateQuestion(q, studentCode) {
-    return new Promise((resolve) => {
-      try {
-        // Create a hidden iframe sandbox
-        const iframe = document.createElement("iframe");
-        iframe.style.cssText =
-          "position:absolute;left:-9999px;top:-9999px;width:800px;height:600px;";
-        iframe.sandbox = "allow-scripts allow-same-origin";
-        document.body.appendChild(iframe);
-
-        const iDoc = iframe.contentDocument || iframe.contentWindow.document;
-        iDoc.open();
-        iDoc.write(
-          `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>${studentCode}</body></html>`,
-        );
-        iDoc.close();
-
-        // Small delay to allow scripts to run
-        setTimeout(() => {
-          let result;
-          try {
-            result = q.validate(iDoc);
-          } catch (err) {
-            result = {
-              pass: false,
-              feedback: "Validation error: " + err.message,
-            };
-          }
-          document.body.removeChild(iframe);
-          resolve(result);
-        }, 150);
-      } catch (err) {
-        resolve({ pass: false, feedback: "Sandbox error: " + err.message });
-      }
-    });
-  }
-
   // Run all questions and compute score
   async function evaluateAll() {
     const qs = ExamState.questions;
     const results = [];
+    let totalScore = 0;
 
     for (const q of qs) {
-      const ta = document.getElementById(`code-${q.id}`);
-      const code = ta ? ta.value.trim() : "";
-      const result = await evaluateQuestion(q, code);
-      ExamState.scores[q.id] = result.pass ? ExamConfig.MARKS_PER_QUESTION : 0;
+      let result = { pass: false, feedback: "" };
+      let marks = 0;
+
+      if (q.type === 'mcq') {
+        const selected = document.querySelector(`input[name="q-${q.id}"]:checked`);
+        if (selected && selected.value === q.correctAnswer) {
+          result = { pass: true, feedback: "Correct" };
+          marks = 1;
+        } else if (selected) {
+          result = { pass: false, feedback: `Incorrect. (Ans: ${q.correctAnswer})` };
+          marks = 0;
+        } else {
+          result = { pass: false, feedback: "Not Answered" };
+          marks = 0;
+        }
+      } else if (q.type === 'code') {
+        const editor = window.monacoEditors ? window.monacoEditors[q.id] : null;
+        const code = editor ? editor.getValue() : "";
+        result = { pass: true, feedback: "Submitted for manual review" };
+        marks = 0; // Manual grading will evaluate these
+      }
+
+      ExamState.scores[q.id] = marks;
+      totalScore += marks;
       results.push({ q, result });
     }
 
-    // Best N of 5
-    const marks = Object.values(ExamState.scores);
-    const sorted = [...marks].sort((a, b) => b - a);
-    const bestN = sorted.slice(0, ExamConfig.BEST_N_QUESTIONS);
-    const total = bestN.reduce((s, v) => s + v, 0);
-
-    return { results, total, marks };
+    return { results, total: totalScore, marks: Object.values(ExamState.scores) };
   }
 
-  return { evaluateQuestion, evaluateAll };
+  return { evaluateAll };
 })();
 
 // ═══════════════════════════════════════════════════════════
@@ -326,39 +303,66 @@ function showScreen(id) {
 function renderQuestions(questions) {
   const container = document.getElementById("questions-container");
   container.innerHTML = "";
+  window.monacoEditors = {};
 
   questions.forEach((q, i) => {
     const card = document.createElement("div");
     card.className = "question-card";
     card.id = `qcard-${q.id}`;
 
-    card.innerHTML = `
-      <div class="q-header">
-        <div class="q-num">Q${i + 1}</div>
-        <div class="q-title">${q.title}</div>
-        <div class="q-marks">10 marks</div>
-      </div>
-      <div class="q-desc">${q.description}</div>
-      <div class="q-workspace">
-        <div class="q-editor-pane">
-          <div class="pane-label">Your Code</div>
-          <textarea class="code-input" id="code-${q.id}" spellcheck="false" autocorrect="off" autocapitalize="off">${q.starterCode}</textarea>
+    if (q.type === 'mcq') {
+      let optionsHtml = '';
+      q.options.forEach(opt => {
+        optionsHtml += `
+          <label style="display:flex; align-items:center; gap:8px; font-family:var(--sans); font-size:14px; text-transform:none; margin:8px 0; color:var(--text); cursor:pointer;">
+            <input type="radio" name="q-${q.id}" value="${opt}" style="width:auto; margin:0; cursor:pointer;">
+            ${opt}
+          </label>`;
+      });
+
+      card.innerHTML = `
+        <div class="q-header">
+          <div class="q-num">Q${i + 1}</div>
+          <div class="q-title" style="white-space: pre-wrap;">${q.title}</div>
+          <div class="q-marks">1 mark</div>
         </div>
-        <div class="q-preview-pane">
-          <div class="pane-label">Preview</div>
-          <iframe class="preview-frame" id="preview-${q.id}" sandbox="allow-scripts allow-same-origin"></iframe>
+        <div class="q-desc" style="border-bottom:none;">
+          ${optionsHtml}
         </div>
-      </div>
-      <div class="q-footer">
-        <button class="btn-run" onclick="ExamApp.runPreview('${q.id}')">▶ Run Preview</button>
-        <div class="q-result" id="result-${q.id}"></div>
-      </div>
-    `;
+      `;
+    } else if (q.type === 'code') {
+      card.innerHTML = `
+        <div class="q-header">
+          <div class="q-num">Q${i + 1}</div>
+          <div class="q-title">${q.title}</div>
+          <div class="q-marks">15 marks</div>
+        </div>
+        <div class="q-desc" style="white-space: pre-wrap;">${q.description}</div>
+        <div class="q-workspace" style="display:block; min-height:400px; padding: 10px;">
+          <div class="pane-label" style="margin-bottom: 10px;">C# Editor (Monaco)</div>
+          <div id="editor-${q.id}" style="height:350px; width:100%; border: 1px solid var(--border);"></div>
+        </div>
+      `;
+    }
 
     container.appendChild(card);
 
-    // Auto-run initial preview
-    setTimeout(() => ExamApp.runPreview(q.id), 200);
+    if (q.type === 'code') {
+      const initMonaco = () => {
+        if (window.monaco) {
+          window.monacoEditors[q.id] = monaco.editor.create(document.getElementById(`editor-${q.id}`), {
+            value: q.starterCode || "// Write your C# code here\n",
+            language: 'csharp',
+            theme: 'vs-dark',
+            minimap: { enabled: false },
+            automaticLayout: true
+          });
+        } else {
+          setTimeout(initMonaco, 500);
+        }
+      };
+      initMonaco();
+    }
   });
 }
 
@@ -418,6 +422,28 @@ const ExamApp = {
 
     if (!name) return _loginError("Please enter your full name.");
     if (!token) return _loginError("Please enter your access token.");
+
+    if (ExamConfig.ENFORCE_TIME_WINDOW && !ExamConfig.BYPASS_TIME_CHECK) {
+      const now = new Date();
+      const localDateStr = now.getFullYear() + "-" + String(now.getMonth()+1).padStart(2,'0') + "-" + String(now.getDate()).padStart(2,'0');
+      
+      if (localDateStr !== ExamConfig.EXAM_DATE) {
+        return _loginError(`Exam is only available on ${ExamConfig.EXAM_DATE}.`);
+      }
+      
+      const currentMinutes = now.getHours() * 60 + now.getMinutes();
+      const startParts = ExamConfig.EXAM_START_TIME.split(":");
+      const startMinutes = parseInt(startParts[0]) * 60 + parseInt(startParts[1]);
+      const endParts = ExamConfig.EXAM_END_TIME.split(":");
+      const endMinutes = parseInt(endParts[0]) * 60 + parseInt(endParts[1]);
+      
+      if (currentMinutes < startMinutes) {
+        return _loginError(`Exam starts at ${ExamConfig.EXAM_START_TIME}.`);
+      }
+      if (currentMinutes > endMinutes) {
+        return _loginError(`Exam ended at ${ExamConfig.EXAM_END_TIME}.`);
+      }
+    }
 
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner"></span>Verifying...';
@@ -485,19 +511,6 @@ const ExamApp = {
       errEl.textContent = msg;
       errEl.style.display = "block";
     }
-  },
-
-  // ── Run live preview ──────────────────────────────────
-  runPreview(qId) {
-    const ta = document.getElementById(`code-${qId}`);
-    const iframe = document.getElementById(`preview-${qId}`);
-    if (!ta || !iframe) return;
-    const doc = iframe.contentDocument || iframe.contentWindow.document;
-    doc.open();
-    doc.write(
-      `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{margin:8px;font-family:sans-serif;font-size:13px;}</style></head><body>${ta.value}</body></html>`,
-    );
-    doc.close();
   },
 
   // ── Manual submit ─────────────────────────────────────

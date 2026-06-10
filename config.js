@@ -1,8 +1,15 @@
 const ExamConfig = {
-  EXAM_DURATION_MINUTES: 30,
-  QUESTIONS_PER_SET: 5,
-  MARKS_PER_QUESTION: 10,
-  BEST_N_QUESTIONS: 3,
+  EXAM_DURATION_MINUTES: 60,
+  // 20 MCQs (1 mark each) + 2 Code Questions (15 marks each) = 50 total marks
+  QUESTIONS_PER_SET: 22, 
+  BEST_N_QUESTIONS: 22, // Count all questions
+
+  // Time Window Constraints (9th June 2026, 9:30am to 10:30am)
+  ENFORCE_TIME_WINDOW: true,
+  EXAM_DATE: "2026-06-09",
+  EXAM_START_TIME: "09:30",
+  EXAM_END_TIME: "10:30",
+  BYPASS_TIME_CHECK: true, // Set to false in production
 
   APPS_SCRIPT_URL:
     "https://script.google.com/macros/library/d/1wglre603gkUKmwTgnvh9qAO0V9zY8NouTTvlALDuKYBIJKg8cH_ZNsM-/3",

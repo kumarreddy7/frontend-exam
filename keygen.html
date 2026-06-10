@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Token Hash Generator</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; background: #faf8f4; color: #1a1714; }
+    textarea { width: 100%; height: 200px; padding: 10px; font-family: monospace; }
+    button { padding: 10px 20px; background: #c8622a; color: white; border: none; cursor: pointer; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h2>Token Hash Generator</h2>
+  <p>Paste your student access tokens (one per line) below. Click Generate to get the SHA-256 hashes for `config.js`.</p>
+  <textarea id="input" placeholder="TOKEN1&#10;TOKEN2"></textarea>
+  <button onclick="generate()">Generate Hashes</button>
+  <h3>Output Hashes</h3>
+  <textarea id="output" readonly></textarea>
+
+  <script>
+    async function hashToken(raw) {
+      const enc = new TextEncoder().encode(raw.trim().toUpperCase());
+      const buf = await crypto.subtle.digest("SHA-256", enc);
+      return Array.from(new Uint8Array(buf))
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
+    }
+
+    async function generate() {
+      const lines = document.getElementById("input").value.split("\n").map(l => l.trim()).filter(Boolean);
+      const out = [];
+      for (const line of lines) {
+        const h = await hashToken(line);
+        out.push(`"${h}", // Token: ${line.toUpperCase()}`);
+      }
+      document.getElementById("output").value = out.join("\n");
+    }
+  </script>
+</body>
+</html>

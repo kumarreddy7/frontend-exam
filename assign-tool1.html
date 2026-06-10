@@ -1,0 +1,1348 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Team Pairing & Project Assignment</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --cream: #faf8f4;
+        --paper: #f3f0eb;
+        --warm: #e8e2d9;
+        --border: #d4cdc3;
+        --text: #1a1714;
+        --muted: #7a7470;
+        --accent: #c8622a;
+        --accent2: #2a7dc8;
+        --green: #2a8c5a;
+        --gold: #c8a22a;
+        --lead-bg: #fff8f0;
+        --shadow: 0 2px 12px rgba(26, 23, 20, 0.08);
+        --shadow-lg: 0 8px 32px rgba(26, 23, 20, 0.14);
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: var(--cream);
+        color: var(--text);
+        font-family: "DM Sans", sans-serif;
+        font-size: 14px;
+        line-height: 1.6;
+        min-height: 100vh;
+      }
+
+      /* HEADER */
+      .header {
+        background: var(--text);
+        color: var(--cream);
+        padding: 18px 36px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .header-title {
+        font-family: "Playfair Display", serif;
+        font-size: 21px;
+        letter-spacing: -0.3px;
+      }
+      .header-sub {
+        font-size: 11px;
+        color: #888;
+        font-family: "DM Mono", monospace;
+        letter-spacing: 1px;
+      }
+      .header-stats {
+        display: flex;
+        gap: 28px;
+        font-family: "DM Mono", monospace;
+        font-size: 11px;
+        color: #999;
+      }
+      .header-stat strong {
+        color: #fff;
+        font-size: 20px;
+        display: block;
+        line-height: 1.1;
+      }
+
+      /* LAYOUT */
+      .main {
+        display: grid;
+        grid-template-columns: 320px 1fr;
+        min-height: calc(100vh - 64px);
+      }
+
+      /* SIDEBAR */
+      .sidebar {
+        background: var(--paper);
+        border-right: 1px solid var(--border);
+        padding: 20px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        overflow-y: auto;
+        max-height: calc(100vh - 64px);
+      }
+      .sidebar-section {
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        overflow: hidden;
+      }
+      .section-head {
+        padding: 10px 14px;
+        background: var(--warm);
+        border-bottom: 1px solid var(--border);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--muted);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .section-badge {
+        background: var(--accent);
+        color: #fff;
+        font-size: 10px;
+        padding: 1px 8px;
+        border-radius: 20px;
+        font-weight: 700;
+        letter-spacing: 0;
+        text-transform: none;
+      }
+
+      /* INPUTS */
+      label {
+        display: block;
+        font-size: 11px;
+        color: var(--muted);
+        margin-bottom: 5px;
+        font-weight: 500;
+      }
+      input[type="text"],
+      textarea {
+        font-family: "DM Sans", sans-serif;
+        font-size: 13px;
+        background: var(--cream);
+        border: 1px solid var(--border);
+        color: var(--text);
+        padding: 8px 10px;
+        outline: none;
+        transition: border-color 0.15s;
+        border-radius: 3px;
+        width: 100%;
+      }
+      input:focus,
+      textarea:focus {
+        border-color: var(--accent);
+      }
+      textarea {
+        resize: vertical;
+        font-family: "DM Mono", monospace;
+        font-size: 12px;
+        line-height: 1.55;
+      }
+
+      /* BUTTONS */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 9px 18px;
+        font-family: "DM Sans", sans-serif;
+        font-size: 13px;
+        font-weight: 600;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        transition: all 0.15s;
+        white-space: nowrap;
+      }
+      .btn-primary {
+        background: var(--accent);
+        color: #fff;
+      }
+      .btn-primary:hover {
+        background: #b5561f;
+      }
+      .btn-primary:disabled {
+        background: var(--border);
+        color: var(--muted);
+        cursor: not-allowed;
+      }
+      .btn-dark {
+        background: var(--text);
+        color: var(--cream);
+      }
+      .btn-dark:hover {
+        background: #2d2925;
+      }
+      .btn-dark:disabled {
+        background: var(--border);
+        color: var(--muted);
+        cursor: not-allowed;
+      }
+      .btn-outline {
+        background: transparent;
+        color: var(--accent);
+        border: 1.5px solid var(--accent);
+      }
+      .btn-outline:hover {
+        background: var(--accent);
+        color: #fff;
+      }
+      .btn-sm {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+      .btn-full {
+        width: 100%;
+      }
+
+      /* STUDENT LIST */
+      .student-list {
+        max-height: 180px;
+        overflow-y: auto;
+      }
+      .student-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 5px 14px;
+        border-bottom: 1px solid #f0ece6;
+        font-size: 12px;
+      }
+      .student-item:last-child {
+        border-bottom: none;
+      }
+      .s-rank {
+        font-family: "DM Mono", monospace;
+        font-size: 10px;
+        color: var(--muted);
+        min-width: 26px;
+      }
+      .s-roll {
+        flex: 1;
+        font-weight: 500;
+      }
+      .s-score {
+        font-family: "DM Mono", monospace;
+        font-size: 11px;
+        color: var(--accent);
+        font-weight: 700;
+      }
+
+      /* STEP INDICATOR */
+      .steps {
+        display: flex;
+        align-items: center;
+        padding: 4px 2px;
+      }
+      .step {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--muted);
+        letter-spacing: 0.3px;
+      }
+      .step.done {
+        color: var(--green);
+      }
+      .step.active {
+        color: var(--accent);
+      }
+      .step-dot {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 2px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 9px;
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+      .step.done .step-dot {
+        border-color: var(--green);
+        background: var(--green);
+        color: #fff;
+      }
+      .step.active .step-dot {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+      .step-line {
+        flex: 1;
+        height: 2px;
+        background: var(--border);
+        margin: 0 4px;
+      }
+      .step.done + .step-line {
+        background: var(--green);
+      }
+
+      /* CONTENT */
+      .content {
+        padding: 28px;
+        overflow-y: auto;
+        max-height: calc(100vh - 64px);
+      }
+
+      /* EMPTY STATE */
+      .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 380px;
+        text-align: center;
+        color: var(--muted);
+      }
+      .empty-icon {
+        font-size: 52px;
+        margin-bottom: 14px;
+        opacity: 0.35;
+      }
+      .empty-title {
+        font-family: "Playfair Display", serif;
+        font-size: 22px;
+        color: var(--text);
+        margin-bottom: 6px;
+      }
+
+      /* RESULT LAYOUT */
+      .result-layout {
+        display: grid;
+        grid-template-columns: 1fr 360px;
+        gap: 24px;
+        align-items: start;
+      }
+
+      /* TEAMS */
+      .teams-header {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        margin-bottom: 18px;
+      }
+      .teams-title {
+        font-family: "Playfair Display", serif;
+        font-size: 24px;
+      }
+      .teams-count {
+        font-family: "DM Mono", monospace;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .team-card {
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        margin-bottom: 10px;
+        overflow: hidden;
+        transition: box-shadow 0.2s;
+      }
+      .team-card:hover {
+        box-shadow: var(--shadow);
+      }
+      .team-card.highlight {
+        animation: cardPop 0.5s ease;
+      }
+      @keyframes cardPop {
+        0% {
+          box-shadow: 0 0 0 3px var(--accent2);
+        }
+        100% {
+          box-shadow: none;
+        }
+      }
+
+      .team-top {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        background: var(--paper);
+        border-bottom: 1px solid var(--border);
+      }
+      .team-num {
+        font-family: "DM Mono", monospace;
+        font-size: 10px;
+        color: var(--muted);
+        background: var(--warm);
+        border: 1px solid var(--border);
+        padding: 2px 7px;
+        border-radius: 2px;
+        white-space: nowrap;
+      }
+      .team-proj-name {
+        flex: 1;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text);
+      }
+      .team-proj-name.pending {
+        color: var(--muted);
+        font-style: italic;
+        font-weight: 400;
+      }
+      .proj-done-tag {
+        font-size: 9px;
+        background: #e8f4ee;
+        color: var(--green);
+        border: 1px solid #b8ddc8;
+        padding: 1px 7px;
+        border-radius: 10px;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      .team-members {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+      .member {
+        padding: 11px 14px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-right: 1px solid var(--border);
+      }
+      .member:last-child {
+        border-right: none;
+      }
+      .member.is-lead {
+        background: var(--lead-bg);
+      }
+      .m-avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+      .member.is-lead .m-avatar {
+        background: var(--accent);
+        color: #fff;
+      }
+      .member:not(.is-lead) .m-avatar {
+        background: var(--warm);
+        color: var(--muted);
+      }
+      .m-roll {
+        font-weight: 600;
+        font-size: 13px;
+      }
+      .m-meta {
+        font-size: 11px;
+        color: var(--muted);
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .lead-badge {
+        font-size: 9px;
+        background: var(--lead-bg);
+        border: 1px solid var(--accent);
+        color: var(--accent);
+        padding: 1px 5px;
+        border-radius: 8px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+      }
+
+      .no-pair-card {
+        background: #fffbf5;
+        border: 1px dashed var(--border);
+        border-radius: 4px;
+        padding: 14px;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      /* ASSIGN PANEL */
+      .assign-panel {
+        position: sticky;
+        top: 0;
+      }
+      .assign-panel-head {
+        font-family: "Playfair Display", serif;
+        font-size: 18px;
+        margin-bottom: 14px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .assign-feed {
+        max-height: 72vh;
+        overflow-y: auto;
+      }
+      .assign-item {
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 12px 14px;
+        margin-bottom: 8px;
+        animation: slideIn 0.35s ease;
+        position: relative;
+        padding-left: 18px;
+      }
+      .assign-item::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: var(--green);
+        border-radius: 4px 0 0 4px;
+      }
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateX(16px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+      .assign-seq {
+        font-family: "DM Mono", monospace;
+        font-size: 10px;
+        color: var(--muted);
+        margin-bottom: 3px;
+      }
+      .assign-project {
+        font-weight: 600;
+        font-size: 13px;
+        margin-bottom: 4px;
+      }
+      .assign-team-info {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .assign-team-info strong {
+        color: var(--text);
+      }
+
+      /* ── MATCHING OVERLAY ── */
+      #match-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(250, 248, 244, 0.97);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+      }
+      #match-overlay.show {
+        display: flex;
+      }
+      .ov-title {
+        font-family: "Playfair Display", serif;
+        font-size: 28px;
+        color: var(--text);
+        margin-bottom: 6px;
+        text-align: center;
+      }
+      .ov-sub {
+        font-size: 13px;
+        color: var(--muted);
+        margin-bottom: 36px;
+        text-align: center;
+      }
+
+      .ov-stage {
+        position: relative;
+        width: 340px;
+        height: 190px;
+        margin-bottom: 36px;
+      }
+
+      .ov-card {
+        position: absolute;
+        width: 135px;
+        padding: 16px 14px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: var(--shadow-lg);
+        text-align: center;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+      .ov-card-a {
+        left: 0;
+        border-top: 4px solid var(--accent);
+        animation: floatA 1.6s ease-in-out infinite;
+      }
+      .ov-card-b {
+        right: 0;
+        border-top: 4px solid var(--accent2);
+        animation: floatB 1.6s ease-in-out infinite;
+      }
+      @keyframes floatA {
+        0%,
+        100% {
+          transform: translateY(-50%);
+        }
+        50% {
+          transform: translateY(calc(-50% - 8px));
+        }
+      }
+      @keyframes floatB {
+        0%,
+        100% {
+          transform: translateY(-50%);
+        }
+        50% {
+          transform: translateY(calc(-50% + 8px));
+        }
+      }
+
+      .ov-card-role {
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+      }
+      .ov-card-a .ov-card-role {
+        color: var(--accent);
+      }
+      .ov-card-b .ov-card-role {
+        color: var(--accent2);
+      }
+      .ov-card-name {
+        font-family: "DM Mono", monospace;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text);
+        word-break: break-all;
+      }
+      .ov-card-sub {
+        font-size: 10px;
+        color: var(--muted);
+        margin-top: 4px;
+      }
+
+      .ov-line {
+        position: absolute;
+        top: 50%;
+        left: 135px;
+        right: 135px;
+        height: 2px;
+        background: linear-gradient(90deg, var(--accent), var(--accent2));
+        transform: translateY(-50%);
+      }
+      .ov-line-dot {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: var(--cream);
+        border: 2px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        animation: spin2 2s linear infinite;
+      }
+      @keyframes spin2 {
+        0% {
+          transform: translate(-50%, -50%) rotate(0deg);
+        }
+        100% {
+          transform: translate(-50%, -50%) rotate(360deg);
+        }
+      }
+
+      /* particles */
+      .ov-particles {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        overflow: hidden;
+      }
+      .particle {
+        position: absolute;
+        border-radius: 50%;
+        animation: pfly 2.5s ease-in-out infinite;
+      }
+      @keyframes pfly {
+        0% {
+          opacity: 0;
+          transform: scale(0) translateY(0);
+        }
+        25% {
+          opacity: 1;
+          transform: scale(1) translateY(-15px);
+        }
+        100% {
+          opacity: 0;
+          transform: scale(0.4) translateY(-100px);
+        }
+      }
+
+      /* progress */
+      .ov-progress {
+        width: 340px;
+      }
+      .ov-bar-bg {
+        background: var(--warm);
+        border-radius: 4px;
+        height: 5px;
+        overflow: hidden;
+        margin-bottom: 8px;
+      }
+      .ov-bar {
+        height: 100%;
+        background: linear-gradient(90deg, var(--accent), var(--gold));
+        width: 0%;
+        transition: width 0.15s linear;
+        border-radius: 4px;
+      }
+      .ov-label {
+        text-align: center;
+        font-size: 12px;
+        color: var(--muted);
+        font-family: "DM Mono", monospace;
+      }
+
+      /* TOAST */
+      .toast {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: var(--text);
+        color: var(--cream);
+        padding: 10px 18px;
+        border-radius: 4px;
+        font-size: 13px;
+        font-weight: 500;
+        box-shadow: var(--shadow-lg);
+        transform: translateY(60px);
+        opacity: 0;
+        transition: all 0.25s;
+        z-index: 500;
+      }
+      .toast.show {
+        transform: translateY(0);
+        opacity: 1;
+      }
+      .toast.ok {
+        background: var(--green);
+      }
+
+      /* info note */
+      .info-note {
+        font-size: 11px;
+        color: var(--muted);
+        background: #f0ece6;
+        border-radius: 3px;
+        padding: 8px 10px;
+        line-height: 1.6;
+      }
+      .info-note strong {
+        color: var(--text);
+      }
+
+      ::-webkit-scrollbar {
+        width: 4px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 2px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- HEADER -->
+    <div class="header">
+      <div>
+        <div class="header-title">Team Pairing &amp; Project Assignment</div>
+        <div class="header-sub">EXAM RESULT ANALYSER · ACADEMIC TOOL</div>
+      </div>
+      <div class="header-stats">
+        <div class="header-stat">
+          <strong id="stat-students">0</strong>students
+        </div>
+        <div class="header-stat"><strong id="stat-pairs">0</strong>teams</div>
+        <div class="header-stat">
+          <strong id="stat-assigned">0</strong>assigned
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+      <!-- SIDEBAR -->
+      <div class="sidebar">
+        <!-- Step indicator -->
+        <div class="sidebar-section" style="background: var(--paper)">
+          <div style="padding: 10px 14px">
+            <div class="steps">
+              <div class="step active" id="step1">
+                <div class="step-dot">1</div>
+                Load
+              </div>
+              <div class="step-line"></div>
+              <div class="step" id="step2">
+                <div class="step-dot">2</div>
+                Pair
+              </div>
+              <div class="step-line"></div>
+              <div class="step" id="step3">
+                <div class="step-dot">3</div>
+                Assign
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Load data -->
+        <div class="sidebar-section">
+          <div class="section-head">
+            Load Student Data
+            <span class="section-badge" id="loaded-badge">0</span>
+          </div>
+          <div style="padding: 14px">
+            <label>Paste data (Roll Number, Score — one per line)</label>
+            <textarea
+              id="sheet-data"
+              rows="6"
+              placeholder="21A91A0501, 28&#10;21A91A0502, 15&#10;21A91A0503, 30&#10;..."
+            ></textarea>
+            <div style="display: flex; gap: 8px; margin-top: 10px">
+              <button
+                class="btn btn-primary btn-sm"
+                onclick="App.loadStudents()"
+              >
+                Load
+              </button>
+              <button class="btn btn-outline btn-sm" onclick="App.loadSample()">
+                Sample
+              </button>
+            </div>
+            <div class="info-note" style="margin-top: 10px">
+              Supports <strong>comma</strong> or <strong>tab</strong> separator.
+              Roll number in first column, score in second.
+            </div>
+          </div>
+        </div>
+
+        <!-- Student preview -->
+        <div class="sidebar-section">
+          <div class="section-head">Ranked Students</div>
+          <div class="student-list" id="student-list">
+            <div
+              style="
+                padding: 14px;
+                color: var(--muted);
+                font-size: 12px;
+                text-align: center;
+              "
+            >
+              No data loaded
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="sidebar-section">
+          <div class="section-head">Actions</div>
+          <div
+            style="
+              padding: 14px;
+              display: flex;
+              flex-direction: column;
+              gap: 10px;
+            "
+          >
+            <button
+              class="btn btn-dark btn-full"
+              id="btn-pair"
+              onclick="App.pairStudents()"
+              disabled
+            >
+              👥 Pair Students
+            </button>
+            <button
+              class="btn btn-primary btn-full"
+              id="btn-assign"
+              onclick="App.showProjectInput()"
+              disabled
+            >
+              🎯 Assign Projects
+            </button>
+          </div>
+        </div>
+
+        <!-- Projects input (revealed after pairing) -->
+        <div class="sidebar-section" id="proj-section" style="display: none">
+          <div class="section-head">Projects List</div>
+          <div style="padding: 14px">
+            <label
+              >Paste projects — best to least important (one per line)</label
+            >
+            <textarea
+              id="proj-input"
+              rows="12"
+              placeholder="Web-Based Library Management System&#10;Online Voting System&#10;Hospital Appointment Booking&#10;Student Attendance Tracker&#10;E-Commerce Product Catalog&#10;Blog CMS Platform&#10;..."
+            ></textarea>
+            <button
+              class="btn btn-primary btn-full"
+              style="margin-top: 10px"
+              onclick="App.runAssignment()"
+            >
+              ✨ Start Assignment
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTENT -->
+      <div class="content" id="content">
+        <div class="empty-state" id="empty-state">
+          <div class="empty-icon">📋</div>
+          <div class="empty-title">Ready to begin</div>
+          <p style="color: var(--muted); font-size: 13px; margin-top: 6px">
+            Paste student exam data in the sidebar to get started.
+          </p>
+        </div>
+
+        <div id="result-area" style="display: none">
+          <div class="result-layout">
+            <!-- Left: Teams -->
+            <div>
+              <div class="teams-header">
+                <div class="teams-title">Teams</div>
+                <div class="teams-count" id="teams-count-label"></div>
+              </div>
+              <div id="teams-list"></div>
+            </div>
+
+            <!-- Right: Feed -->
+            <div class="assign-panel" id="assign-panel" style="display: none">
+              <div class="assign-panel-head">
+                Assignment Feed
+                <span
+                  style="
+                    font-family: &quot;DM Mono&quot;, monospace;
+                    font-size: 12px;
+                    color: var(--muted);
+                  "
+                  id="feed-count"
+                  >0 done</span
+                >
+              </div>
+              <div class="assign-feed" id="assign-feed"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MATCHING OVERLAY -->
+    <div id="match-overlay">
+      <div class="ov-title">Assigning Projects</div>
+      <div class="ov-sub">Matching teams to projects by performance rank</div>
+
+      <div class="ov-stage">
+        <div class="ov-particles" id="ov-particles"></div>
+        <div class="ov-card ov-card-a">
+          <div class="ov-card-role">Lead (Best)</div>
+          <div class="ov-card-name" id="ov-lead">—</div>
+          <div class="ov-card-sub" id="ov-lead-score">Score —</div>
+        </div>
+        <div class="ov-line">
+          <div class="ov-line-dot">⟷</div>
+        </div>
+        <div class="ov-card ov-card-b">
+          <div class="ov-card-role">Project</div>
+          <div class="ov-card-name" id="ov-proj">—</div>
+          <div class="ov-card-sub" id="ov-member">Member: —</div>
+        </div>
+      </div>
+
+      <div class="ov-progress">
+        <div class="ov-bar-bg"><div class="ov-bar" id="ov-bar"></div></div>
+        <div class="ov-label" id="ov-label">Preparing...</div>
+      </div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+      // ───────────────────────────────────────────────
+      // STATE
+      // ───────────────────────────────────────────────
+      const S = {
+        students: [],
+        pairs: [],
+        unpaired: null,
+        assigned: 0,
+      };
+
+      // ───────────────────────────────────────────────
+      // UTILS
+      // ───────────────────────────────────────────────
+      function toast(msg, type = "") {
+        const el = document.getElementById("toast");
+        el.textContent = msg;
+        el.className = "toast show " + type;
+        setTimeout(() => {
+          el.className = "toast";
+        }, 2800);
+      }
+
+      function setStep(n) {
+        ["step1", "step2", "step3"].forEach((id, i) => {
+          const el = document.getElementById(id);
+          const num = i + 1;
+          el.className =
+            "step" + (num < n ? " done" : num === n ? " active" : "");
+          el.querySelector(".step-dot").textContent =
+            num < n ? "✓" : String(num);
+        });
+      }
+
+      function updateStats() {
+        document.getElementById("stat-students").textContent =
+          S.students.length;
+        document.getElementById("stat-pairs").textContent = S.pairs.length;
+        document.getElementById("stat-assigned").textContent = S.assigned;
+      }
+
+      // ───────────────────────────────────────────────
+      // SOUND
+      // ───────────────────────────────────────────────
+      function playMatch() {
+        try {
+          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+          [
+            [523, 0.0],
+            [659, 0.18],
+            [784, 0.36],
+            [1047, 0.54],
+          ].forEach(([f, t]) => {
+            const o = ctx.createOscillator(),
+              g = ctx.createGain();
+            o.connect(g);
+            g.connect(ctx.destination);
+            o.frequency.value = f;
+            o.type = "sine";
+            g.gain.setValueAtTime(0, ctx.currentTime + t);
+            g.gain.linearRampToValueAtTime(0.15, ctx.currentTime + t + 0.06);
+            g.gain.linearRampToValueAtTime(0, ctx.currentTime + t + 0.3);
+            o.start(ctx.currentTime + t);
+            o.stop(ctx.currentTime + t + 0.35);
+          });
+        } catch (e) {}
+      }
+
+      // ───────────────────────────────────────────────
+      // PARTICLES
+      // ───────────────────────────────────────────────
+      function spawnParticles() {
+        const wrap = document.getElementById("ov-particles");
+        wrap.innerHTML = "";
+        const cols = [
+          "#c8622a",
+          "#2a7dc8",
+          "#2a8c5a",
+          "#c8a22a",
+          "#c82a7d",
+          "#2ac8c8",
+        ];
+        for (let i = 0; i < 20; i++) {
+          const p = document.createElement("div");
+          p.className = "particle";
+          const sz = 4 + Math.random() * 7;
+          p.style.cssText = `
+      left:${5 + Math.random() * 90}%;top:${20 + Math.random() * 60}%;
+      width:${sz}px;height:${sz}px;background:${cols[~~(Math.random() * cols.length)]};
+      animation-delay:${Math.random() * 1.8}s;animation-duration:${1.8 + Math.random() * 1.5}s;
+    `;
+          wrap.appendChild(p);
+        }
+      }
+
+      // ───────────────────────────────────────────────
+      // APP
+      // ───────────────────────────────────────────────
+      const App = {
+        loadSample() {
+          document.getElementById("sheet-data").value =
+            `21A91A0501,28\n21A91A0502,15\n21A91A0503,30\n21A91A0504,8\n21A91A0505,22\n21A91A0506,12\n21A91A0507,27\n21A91A0508,10\n21A91A0509,20\n21A91A0510,5\n21A91A0511,24\n21A91A0512,18\n21A91A0513,29\n21A91A0514,7\n21A91A0515,23\n21A91A0516,16\n21A91A0517,26\n21A91A0518,11\n21A91A0519,21\n21A91A0520,9\n21A91A0521,25\n21A91A0522,14`;
+          this.loadStudents();
+        },
+
+        loadStudents() {
+          const raw = document.getElementById("sheet-data").value.trim();
+          if (!raw) {
+            toast("Paste data first.");
+            return;
+          }
+          const lines = raw
+            .split("\n")
+            .map((l) => l.trim())
+            .filter(Boolean);
+          const out = [];
+          for (const line of lines) {
+            const parts = line.split(/[,\t]+/).map((p) => p.trim());
+            if (parts.length < 2) continue;
+            const score = parseFloat(parts[1]);
+            if (!parts[0] || isNaN(score)) continue;
+            out.push({ roll: parts[0], score });
+          }
+          if (out.length < 2) {
+            toast("Need at least 2 valid rows.");
+            return;
+          }
+          out.sort((a, b) => b.score - a.score);
+          S.students = out;
+
+          document.getElementById("loaded-badge").textContent = out.length;
+          document.getElementById("student-list").innerHTML = out
+            .map(
+              (s, i) => `
+      <div class="student-item">
+        <span class="s-rank">#${i + 1}</span>
+        <span class="s-roll">${s.roll}</span>
+        <span class="s-score">${s.score}</span>
+      </div>`,
+            )
+            .join("");
+
+          document.getElementById("btn-pair").disabled = false;
+          setStep(2);
+          updateStats();
+          toast(`${out.length} students loaded & ranked`, "ok");
+        },
+
+        pairStudents() {
+          const s = [...S.students]; // clone to avoid mutating original
+          if (!s.length) {
+            toast("Load students first.");
+            return;
+          }
+
+          // Fisher-Yates Shuffle
+          for (let i = s.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [s[i], s[j]] = [s[j], s[i]];
+          }
+
+          const n = s.length;
+          const half = Math.floor(n / 2);
+
+          S.pairs = [];
+          S.unpaired = null;
+          S.assigned = 0;
+
+          // Pair sequentially after shuffle
+          for (let i = 0; i < half; i++) {
+            S.pairs.push({
+              teamNum: i + 1,
+              lead: s[i * 2],
+              member: s[i * 2 + 1],
+              project: null,
+            });
+          }
+
+          // Handle odd student
+          if (n % 2 !== 0) {
+            S.unpaired = s[n - 1];
+          }
+
+          document.getElementById("teams-count-label").textContent =
+            `${S.pairs.length} team${S.pairs.length !== 1 ? "s" : ""}${S.unpaired ? " · 1 unpaired" : ""}`;
+
+          document.getElementById("btn-assign").disabled = false;
+          document.getElementById("empty-state").style.display = "none";
+          document.getElementById("result-area").style.display = "block";
+          document.getElementById("assign-panel").style.display = "none";
+
+          this._renderTeams();
+          setStep(3);
+          updateStats();
+          toast(`${S.pairs.length} teams formed!`, "ok");
+        },
+        _renderTeams() {
+          const el = document.getElementById("teams-list");
+          let html = "";
+          for (const p of S.pairs) {
+            html += `
+      <div class="team-card" id="tc-${p.teamNum}">
+        <div class="team-top">
+          <div class="team-num">Team ${p.teamNum}</div>
+          <div class="team-proj-name ${p.project ? "" : "pending"}" id="tp-${p.teamNum}">${p.project || "Pending project assignment..."}</div>
+          ${p.project ? '<span class="proj-done-tag">✓ Assigned</span>' : ""}
+        </div>
+        <div class="team-members">
+          <div class="member is-lead">
+            <div class="m-avatar">${p.lead.roll.slice(-2)}</div>
+            <div>
+              <div class="m-roll">${p.lead.roll}</div>
+              <div class="m-meta"><span class="lead-badge">Lead</span> ${p.lead.score} pts</div>
+            </div>
+          </div>
+          <div class="member">
+            <div class="m-avatar">${p.member.roll.slice(-2)}</div>
+            <div>
+              <div class="m-roll">${p.member.roll}</div>
+              <div class="m-meta">Member · ${p.member.score} pts</div>
+            </div>
+          </div>
+        </div>
+      </div>`;
+          }
+          if (S.unpaired) {
+            html += `<div class="no-pair-card">
+        <span style="font-size:20px;">⚠️</span>
+        <div><strong>${S.unpaired.roll}</strong> — no pair assigned (odd number of students). Score: ${S.unpaired.score}</div>
+      </div>`;
+          }
+          el.innerHTML = html;
+        },
+
+        showProjectInput() {
+          const sec = document.getElementById("proj-section");
+          sec.style.display = "block";
+          sec.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        },
+
+        async runAssignment() {
+          const raw = document.getElementById("proj-input").value.trim();
+          if (!raw) {
+            toast("Paste your projects list first.");
+            return;
+          }
+          const projects = raw
+            .split("\n")
+            .map((l) => l.trim())
+            .filter(Boolean);
+          if (projects.length < S.pairs.length) {
+            toast(
+              `Need at least ${S.pairs.length} projects for ${S.pairs.length} teams.`,
+            );
+            return;
+          }
+
+          // Show feed panel
+          document.getElementById("assign-panel").style.display = "block";
+          document.getElementById("assign-feed").innerHTML = "";
+          S.assigned = 0;
+          updateStats();
+
+          // Show overlay
+          const overlay = document.getElementById("match-overlay");
+          overlay.classList.add("show");
+          spawnParticles();
+
+          const total = S.pairs.length;
+
+          for (let i = 0; i < total; i++) {
+            const pair = S.pairs[i];
+            const proj = projects[i];
+
+            // Update overlay
+            document.getElementById("ov-lead").textContent = pair.lead.roll;
+            document.getElementById("ov-lead-score").textContent =
+              `Score: ${pair.lead.score}`;
+            document.getElementById("ov-proj").textContent =
+              proj.length > 20 ? proj.slice(0, 18) + "…" : proj;
+            document.getElementById("ov-member").textContent =
+              `Member: ${pair.member.roll}`;
+            document.getElementById("ov-bar").style.width =
+              `${(i / total) * 100}%`;
+            document.getElementById("ov-label").textContent =
+              `Assigning ${i + 1} of ${total}...`;
+
+            playMatch();
+            spawnParticles();
+
+            const delay = Math.max(280, Math.min(800, 3200 / total));
+            await new Promise((r) => setTimeout(r, delay));
+
+            // Assign
+            pair.project = proj;
+            S.assigned++;
+            updateStats();
+
+            // Update card label
+            const lbl = document.getElementById(`tp-${pair.teamNum}`);
+            if (lbl) {
+              lbl.textContent = proj;
+              lbl.classList.remove("pending");
+            }
+
+            const card = document.getElementById(`tc-${pair.teamNum}`);
+            if (card) {
+              card.classList.add("highlight");
+              setTimeout(() => card.classList.remove("highlight"), 600);
+            }
+
+            // Feed entry
+            const feed = document.getElementById("assign-feed");
+            const item = document.createElement("div");
+            item.className = "assign-item";
+            item.innerHTML = `
+        <div class="assign-seq">Assignment ${i + 1} / ${total}</div>
+        <div class="assign-project">${proj}</div>
+        <div class="assign-team-info">Team ${pair.teamNum} · <strong>${pair.lead.roll}</strong> (Lead) &amp; <strong>${pair.member.roll}</strong></div>`;
+            feed.insertBefore(item, feed.firstChild);
+            document.getElementById("feed-count").textContent =
+              `${S.assigned} done`;
+          }
+
+          // Done
+          document.getElementById("ov-bar").style.width = "100%";
+          document.getElementById("ov-label").textContent =
+            "✓ All teams assigned!";
+          await new Promise((r) => setTimeout(r, 700));
+          overlay.classList.remove("show");
+          toast("🎉 All projects assigned!", "ok");
+        },
+      };
+
+      updateStats();
+    </script>
+  </body>
+</html>
