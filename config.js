@@ -12,7 +12,7 @@ const ExamConfig = {
   BYPASS_TIME_CHECK: true, // Set to false in production
 
   APPS_SCRIPT_URL:
-    "https://script.google.com/macros/library/d/1wglre603gkUKmwTgnvh9qAO0V9zY8NouTTvlALDuKYBIJKg8cH_ZNsM-/3",
+    "https://script.google.com/macros/s/AKfycbwfSJTecVuJ3JhihguoiyV2jCyqrvqi65pGZ_MUIYz80UyWwsFl5VF6U35i8lnHs_yG/exec",
 
   VALID_TOKEN_HASHES: new Set([
     "0057e786e00a2a3bc0f6c994ea4511ffd007e4ed8ac294c7bbb8769d9061be64", // TEST-TOKEN
