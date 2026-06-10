@@ -163,20 +163,21 @@ const Evaluator = (() => {
 
       if (q.type === 'mcq') {
         const selected = document.querySelector(`input[name="q-${q.id}"]:checked`);
+        let answerText = selected ? selected.value : "";
         if (selected && selected.value === q.correctAnswer) {
-          result = { pass: true, feedback: "Correct" };
+          result = { pass: true, feedback: "Correct", answer: answerText };
           marks = 1;
         } else if (selected) {
-          result = { pass: false, feedback: `Incorrect. (Ans: ${q.correctAnswer})` };
+          result = { pass: false, feedback: `Incorrect. (Ans: ${q.correctAnswer})`, answer: answerText };
           marks = 0;
         } else {
-          result = { pass: false, feedback: "Not Answered" };
+          result = { pass: false, feedback: "Not Answered", answer: "Not Answered" };
           marks = 0;
         }
       } else if (q.type === 'code') {
         const editor = window.monacoEditors ? window.monacoEditors[q.id] : null;
         const code = editor ? editor.getValue() : "";
-        result = { pass: true, feedback: "Submitted for manual review" };
+        result = { pass: true, feedback: "Submitted for manual review", answer: code };
         marks = 0; // Manual grading will evaluate these
       }
 
@@ -205,8 +206,10 @@ const Submission = (() => {
       details: JSON.stringify(
         results.map((r) => ({
           id: r.q.id,
+          title: r.q.title,
           pass: r.result.pass,
           marks: ExamState.scores[r.q.id],
+          answer: r.result.answer,
         })),
       ),
       tabSwitches: ExamState.tabSwitches,
