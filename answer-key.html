@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Instructor Answer Key</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text: #f1f5f9;
+      --accent: #3b82f6;
+      --success: #10b981;
+      --border: #334155;
+      --muted: #94a3b8;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0; padding: 20px;
+    }
+    header { text-align: center; margin-bottom: 30px; }
+    h1 { color: var(--accent); }
+    .tabs {
+      display: flex; justify-content: center; gap: 10px; margin-bottom: 20px;
+    }
+    .tab-btn {
+      background: var(--card-bg); border: 1px solid var(--border);
+      color: var(--text); padding: 10px 20px; border-radius: 8px;
+      cursor: pointer; font-size: 16px; transition: 0.2s;
+    }
+    .tab-btn:hover, .tab-btn.active {
+      background: var(--accent); border-color: var(--accent);
+    }
+    .set-content { display: none; max-width: 1000px; margin: 0 auto; }
+    .set-content.active { display: block; }
+    
+    .question-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px; margin-bottom: 20px;
+    }
+    .q-title { font-size: 18px; margin: 0 0 15px 0; font-weight: 600; }
+    .mcq-option {
+      padding: 10px 15px; background: rgba(0,0,0,0.2);
+      border-radius: 6px; margin-bottom: 8px; display: flex; align-items: center;
+    }
+    .mcq-option.correct {
+      background: rgba(16, 185, 129, 0.2);
+      border-left: 4px solid var(--success);
+      font-weight: 600; color: #34d399;
+    }
+    .explanation {
+      margin-top: 15px; padding: 15px; background: rgba(59, 130, 246, 0.1);
+      border-radius: 8px; color: #bfdbfe; font-size: 14px; line-height: 1.5;
+    }
+    .badge {
+      display: inline-block; padding: 3px 8px; border-radius: 4px;
+      font-size: 12px; font-weight: bold; margin-bottom: 10px;
+    }
+    .badge-mcq { background: #475569; color: white; }
+    .badge-code { background: #8b5cf6; color: white; }
+    
+    pre {
+      background: #000 !important; border-radius: 8px;
+      padding: 15px !important; overflow-x: auto;
+    }
+    code { font-family: "Fira Code", "Consolas", monospace; }
+    .stats {
+      display: flex; gap: 15px; margin: 15px 0;
+    }
+    .stat { background: #334155; padding: 5px 10px; border-radius: 5px; font-size: 13px; }
+  </style>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+</head>
+<body>
+  <header>
+    <h1>.NET Fullstack Exam - Official Answer Key</h1>
+    <p>Detailed explanations and optimal approaches for Sets A, B, C, and D</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab('A')">Set A</button>
+    <button class="tab-btn" onclick="showTab('B')">Set B</button>
+    <button class="tab-btn" onclick="showTab('C')">Set C</button>
+    <button class="tab-btn" onclick="showTab('D')">Set D</button>
+  </div>
+  <div id="set-A" class="set-content active">
+    <h2>Question Set A</h2>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">A1. What is the ultimate base class for all C# classes?</p>
+      <div class="mcq-option correct">✓ System.Object</div>
+      <div class="mcq-option ">System.Base</div>
+      <div class="mcq-option ">System.Class</div>
+      <div class="mcq-option ">System.Root</div>
+      <div class="explanation"><strong>Explanation:</strong> System.Object is the root type of the unified type system in .NET. All classes, structures, and enumerations implicitly inherit from it.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">A2. Which collection operates on a Last-In-First-Out (LIFO) principle?</p>
+      <div class="mcq-option ">Queue</div>
+      <div class="mcq-option correct">✓ Stack</div>
+      <div class="mcq-option ">List</div>
+      <div class="mcq-option ">HashSet</div>
+      <div class="explanation"><strong>Explanation:</strong> A Stack uses LIFO (Last-In-First-Out) where elements are pushed and popped from the same end (the top).</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">A3. What is the time complexity of a Binary Search on a sorted array?</p>
+      <div class="mcq-option ">O(1)</div>
+      <div class="mcq-option ">O(n)</div>
+      <div class="mcq-option correct">✓ O(log n)</div>
+      <div class="mcq-option ">O(n^2)</div>
+      <div class="explanation"><strong>Explanation:</strong> Binary search repeatedly halves the search interval, resulting in O(log n) time complexity, but requires a sorted collection.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">A4. Which sorting algorithm has a worst-case time complexity of O(n log n)?</p>
+      <div class="mcq-option ">Bubble Sort</div>
+      <div class="mcq-option ">Insertion Sort</div>
+      <div class="mcq-option ">Quick Sort</div>
+      <div class="mcq-option correct">✓ Merge Sort</div>
+      <div class="explanation"><strong>Explanation:</strong> Merge Sort guarantees O(n log n) even in the worst case by consistently dividing the array in half and merging sorted halves.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">A5. Which attribute marks a method as a test method in NUnit?</p>
+      <div class="mcq-option ">[TestMethod]</div>
+      <div class="mcq-option correct">✓ [Test]</div>
+      <div class="mcq-option ">[Fact]</div>
+      <div class="mcq-option ">[TestCase]</div>
+      <div class="explanation"><strong>Explanation:</strong> [Test] is the standard attribute used in NUnit to indicate that a method is a test case to be executed by the test runner.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">A6. Which built-in delegate represents a method that takes no parameters and returns void?</p>
+      <div class="mcq-option ">Func</div>
+      <div class="mcq-option correct">✓ Action</div>
+      <div class="mcq-option ">Predicate</div>
+      <div class="mcq-option ">EventHandler</div>
+      <div class="explanation"><strong>Explanation:</strong> The Action delegate represents a method that takes no parameters (or up to 16) and does not return a value (void).</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">A7. In Func<int, bool>, what does the bool represent?</p>
+      <div class="mcq-option ">First parameter</div>
+      <div class="mcq-option ">Second parameter</div>
+      <div class="mcq-option correct">✓ Return type</div>
+      <div class="mcq-option ">Exception type</div>
+      <div class="explanation"><strong>Explanation:</strong> In Func delegates, the final type parameter always specifies the return type of the method. So bool is the return type.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">A8. What is the lambda operator in C#?</p>
+      <div class="mcq-option correct">✓ =></div>
+      <div class="mcq-option ">-></div>
+      <div class="mcq-option ">::</div>
+      <div class="mcq-option ">~></div>
+      <div class="explanation"><strong>Explanation:</strong> The => operator is the lambda declaration operator. It separates the input variables on the left from the lambda body on the right.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">A9. Which LINQ method is used to filter a sequence based on a predicate?</p>
+      <div class="mcq-option ">Select</div>
+      <div class="mcq-option correct">✓ Where</div>
+      <div class="mcq-option ">Filter</div>
+      <div class="mcq-option ">Find</div>
+      <div class="explanation"><strong>Explanation:</strong> The Where method evaluates each element against a predicate and yields those for which the predicate is true.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">A10. What syntax denotes a generic class in C#?</p>
+      <div class="mcq-option ">class MyClass[T]</div>
+      <div class="mcq-option correct">✓ class MyClass<T></div>
+      <div class="mcq-option ">class MyClass(T)</div>
+      <div class="mcq-option ">class MyClass{T}</div>
+      <div class="explanation"><strong>Explanation:</strong> Angle brackets <T> denote a generic type parameter in C#, allowing classes and methods to operate on various types safely.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">A11. Which OOP principle is implemented using access modifiers (private, public)?</p>
+      <div class="mcq-option ">Inheritance</div>
+      <div class="mcq-option ">Polymorphism</div>
+      <div class="mcq-option correct">✓ Encapsulation</div>
+      <div class="mcq-option ">Abstraction</div>
+      <div class="explanation"><strong>Explanation:</strong> Encapsulation hides internal state and requires all interaction to be performed through an object's methods or properties, enforced via access modifiers.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">A12. Can an interface in C# contain instance fields?</p>
+      <div class="mcq-option ">Yes</div>
+      <div class="mcq-option correct">✓ No</div>
+      <div class="mcq-option ">Only if static</div>
+      <div class="mcq-option ">Only in C# 8+</div>
+      <div class="explanation"><strong>Explanation:</strong> Interfaces define contracts (methods, properties, events) but cannot contain instance fields or concrete state.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">A13. What does a Dictionary<TKey, TValue> store?</p>
+      <div class="mcq-option ">Ordered lists</div>
+      <div class="mcq-option correct">✓ Key-Value pairs</div>
+      <div class="mcq-option ">Unique singletons</div>
+      <div class="mcq-option ">Nodes</div>
+      <div class="explanation"><strong>Explanation:</strong> A Dictionary uses a hash table to store Key-Value pairs, allowing fast lookups via the Key.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">A14. What is the worst-case time complexity of Linear Search?</p>
+      <div class="mcq-option ">O(1)</div>
+      <div class="mcq-option ">O(log n)</div>
+      <div class="mcq-option correct">✓ O(n)</div>
+      <div class="mcq-option ">O(n log n)</div>
+      <div class="explanation"><strong>Explanation:</strong> Linear Search must check every element in the worst case (when the target is at the end or missing), taking O(n) time.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">A15. What is the best-case time complexity of an optimized Bubble Sort?</p>
+      <div class="mcq-option ">O(1)</div>
+      <div class="mcq-option correct">✓ O(n)</div>
+      <div class="mcq-option ">O(n log n)</div>
+      <div class="mcq-option ">O(n^2)</div>
+      <div class="explanation"><strong>Explanation:</strong> An optimized Bubble Sort can detect if the array is already sorted in the first pass and terminate early, giving O(n) best-case time.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">A16. Which NUnit attribute runs code before each test method?</p>
+      <div class="mcq-option ">[TestInitialize]</div>
+      <div class="mcq-option correct">✓ [SetUp]</div>
+      <div class="mcq-option ">[BeforeEach]</div>
+      <div class="mcq-option ">[Init]</div>
+      <div class="explanation"><strong>Explanation:</strong> [SetUp] marks a method to be run immediately before each test method runs, useful for initializing test data.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">A17. What is the return type of a Predicate<T> delegate?</p>
+      <div class="mcq-option ">void</div>
+      <div class="mcq-option ">int</div>
+      <div class="mcq-option correct">✓ bool</div>
+      <div class="mcq-option ">T</div>
+      <div class="explanation"><strong>Explanation:</strong> Predicate<T> represents a method that takes one parameter and returns a boolean, typically used for filtering.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">A18. How many input parameters does Action<T1, T2> take?</p>
+      <div class="mcq-option ">1</div>
+      <div class="mcq-option correct">✓ 2</div>
+      <div class="mcq-option ">3</div>
+      <div class="mcq-option ">0</div>
+      <div class="explanation"><strong>Explanation:</strong> Action<T1, T2> explicitly has two generic type parameters representing two input parameters.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">A19. In LINQ, what is the Select method primarily used for?</p>
+      <div class="mcq-option ">Filtering</div>
+      <div class="mcq-option correct">✓ Projection</div>
+      <div class="mcq-option ">Sorting</div>
+      <div class="mcq-option ">Grouping</div>
+      <div class="explanation"><strong>Explanation:</strong> Select is used for projection—transforming or shaping elements from a sequence into a new form.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">A20. Which namespace contains List<T>?</p>
+      <div class="mcq-option ">System.Linq</div>
+      <div class="mcq-option ">System.Collections</div>
+      <div class="mcq-option correct">✓ System.Collections.Generic</div>
+      <div class="mcq-option ">System.Data</div>
+      <div class="explanation"><strong>Explanation:</strong> List<T> is a generic collection located in the System.Collections.Generic namespace.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-code">CODE (Logic: Reverse a String)</span>
+      <p class="q-title">A21. Write a C# method to reverse a string without using built-in methods like Array.Reverse or LINQ.</p>
+      <pre><code class="language-csharp">public class Solution {
+    public string ReverseString(string s) {
+        char[] charArray = s.ToCharArray();
+        int left = 0;
+        int right = s.Length - 1;
+        while (left &lt; right) {
+            char temp = charArray[left];
+            charArray[left] = charArray[right];
+            charArray[right] = temp;
+            left++; right--;
+        }
+        return new string(charArray);
+    }
+}</code></pre>
+      <div class="stats">
+        <div class="stat">⏱ Time: O(N) - We iterate through half the string length.</div>
+        <div class="stat">💾 Space: O(N) - A new char array is allocated to hold the characters.</div>
+      </div>
+      <div class="explanation">
+        <strong>Optimal Approach:</strong> The Two-Pointer approach is the most optimal. We convert the string to a character array (since strings are immutable in C#), place one pointer at the start and one at the end, and swap characters as the pointers move toward the middle.<br><br>
+        <strong>Alternative Approach:</strong> Alternative approach: Iterate from the end of the string and append to a `StringBuilder`. Time complexity is O(N), but it involves slightly more overhead than an in-place char array swap.
+      </div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-code">CODE (Console App: Employee Payroll)</span>
+      <p class="q-title">A22. Create a Console App that manages Employee data (Id, Name, Salary). It should allow adding an employee, displaying all employees, and calculating total payroll. Use OOP concepts.</p>
+      <pre><code class="language-csharp">using System;
+using System.Collections.Generic;
+
+namespace PayrollApp {
+    public class Employee {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public decimal Salary { get; set; }
+    }
+
+    class Program {
+        static void Main() {
+            var employees = new List&lt;Employee&gt; {
+                new Employee { Id = 1, Name = "Alice", Salary = 50000 },
+                new Employee { Id = 2, Name = "Bob", Salary = 60000 }
+            };
+
+            decimal totalPayroll = 0;
+            Console.WriteLine("Employee List:");
+            foreach(var emp in employees) {
+                Console.WriteLine($"ID: {emp.Id}, Name: {emp.Name}, Salary: {emp.Salary:C}");
+                totalPayroll += emp.Salary;
+            }
+            Console.WriteLine($"Total Payroll: {totalPayroll:C}");
+        }
+    }
+}</code></pre>
+      <div class="stats">
+        <div class="stat">⏱ Time: O(N) to calculate total payroll.</div>
+        <div class="stat">💾 Space: O(N) to store employees in the list.</div>
+      </div>
+      <div class="explanation">
+        <strong>Optimal Approach:</strong> This solution uses a List<Employee> to store employee objects. We iterate through the list to display details and calculate the sum of the salaries.<br><br>
+        <strong>Alternative Approach:</strong> A Dictionary<int, Employee> could be used for O(1) lookups by ID if editing/deleting employees was a requirement.
+      </div>
+    </div>
+  </div>
+  <div id="set-B" class="set-content ">
+    <h2>Question Set B</h2>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">B1. Which symbol is used for inheritance in C#?</p>
+      <div class="mcq-option correct">✓ :</div>
+      <div class="mcq-option ">extends</div>
+      <div class="mcq-option ">-></div>
+      <div class="mcq-option ">::</div>
+      <div class="explanation"><strong>Explanation:</strong> The colon (:) symbol is used to inherit from a base class or implement an interface in C#.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">B2. Which collection is best for storing a set of unique elements?</p>
+      <div class="mcq-option ">List</div>
+      <div class="mcq-option ">Array</div>
+      <div class="mcq-option correct">✓ HashSet</div>
+      <div class="mcq-option ">Queue</div>
+      <div class="explanation"><strong>Explanation:</strong> HashSet<T> uses a hash table to ensure all stored elements are unique, providing O(1) insertions and lookups.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">B3. What is a prerequisite for using Binary Search?</p>
+      <div class="mcq-option ">Array must be reversed</div>
+      <div class="mcq-option correct">✓ Array must be sorted</div>
+      <div class="mcq-option ">Array must have even length</div>
+      <div class="mcq-option ">None</div>
+      <div class="explanation"><strong>Explanation:</strong> Binary Search relies on comparing elements to the middle value to discard half the search space, which only works if elements are sorted.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">B4. Which algorithmic paradigm does Quick Sort use?</p>
+      <div class="mcq-option ">Dynamic Programming</div>
+      <div class="mcq-option ">Greedy</div>
+      <div class="mcq-option correct">✓ Divide and Conquer</div>
+      <div class="mcq-option ">Backtracking</div>
+      <div class="explanation"><strong>Explanation:</strong> Quick Sort divides the array into sub-arrays around a pivot and recursively sorts them, which is Divide and Conquer.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">B5. Which NUnit attribute runs code after each test method?</p>
+      <div class="mcq-option correct">✓ [TearDown]</div>
+      <div class="mcq-option ">[TestCleanup]</div>
+      <div class="mcq-option ">[AfterEach]</div>
+      <div class="mcq-option ">[Clean]</div>
+      <div class="explanation"><strong>Explanation:</strong> [TearDown] runs after every test method to clean up resources, close connections, or reset states.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">B6. Which delegate is typically used for standard events in .NET?</p>
+      <div class="mcq-option ">Action</div>
+      <div class="mcq-option ">Func</div>
+      <div class="mcq-option correct">✓ EventHandler</div>
+      <div class="mcq-option ">Predicate</div>
+      <div class="explanation"><strong>Explanation:</strong> EventHandler is the standard delegate for .NET events, taking a sender object and EventArgs.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">B7. In Func<string, int>, what is the input parameter type?</p>
+      <div class="mcq-option correct">✓ string</div>
+      <div class="mcq-option ">int</div>
+      <div class="mcq-option ">void</div>
+      <div class="mcq-option ">bool</div>
+      <div class="explanation"><strong>Explanation:</strong> In Func delegates, the types before the final one are inputs. So string is the input parameter.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">B8. Does a lambda expression support type inference for parameters?</p>
+      <div class="mcq-option correct">✓ Yes</div>
+      <div class="mcq-option ">No</div>
+      <div class="mcq-option ">Only for ints</div>
+      <div class="mcq-option ">Only in LINQ</div>
+      <div class="explanation"><strong>Explanation:</strong> Yes, the compiler infers the types of lambda parameters based on the delegate type they are assigned to.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">B9. Which LINQ method sorts elements in ascending order?</p>
+      <div class="mcq-option ">Sort</div>
+      <div class="mcq-option correct">✓ OrderBy</div>
+      <div class="mcq-option ">Order</div>
+      <div class="mcq-option ">SortBy</div>
+      <div class="explanation"><strong>Explanation:</strong> OrderBy sorts the elements of a sequence in ascending order based on a specified key selector.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">B10. Can a C# class implement multiple interfaces?</p>
+      <div class="mcq-option correct">✓ Yes</div>
+      <div class="mcq-option ">No</div>
+      <div class="mcq-option ">Only if they have same methods</div>
+      <div class="mcq-option ">Only 2 max</div>
+      <div class="explanation"><strong>Explanation:</strong> Unlike classes (which support single inheritance), a C# class can implement any number of interfaces.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">B11. Method overriding is an example of which type of polymorphism?</p>
+      <div class="mcq-option ">Compile-time</div>
+      <div class="mcq-option correct">✓ Run-time</div>
+      <div class="mcq-option ">Static</div>
+      <div class="mcq-option ">Ad-hoc</div>
+      <div class="explanation"><strong>Explanation:</strong> Method overriding is resolved dynamically at run-time (Dynamic/Run-time polymorphism), depending on the actual object type.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">B12. Which collection operates on a First-In-First-Out (FIFO) principle?</p>
+      <div class="mcq-option ">Stack</div>
+      <div class="mcq-option correct">✓ Queue</div>
+      <div class="mcq-option ">Dictionary</div>
+      <div class="mcq-option ">List</div>
+      <div class="explanation"><strong>Explanation:</strong> A Queue uses FIFO (First-In-First-Out). Elements are enqueued at the back and dequeued from the front.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">B13. Interpolation search is an improved variant of which algorithm?</p>
+      <div class="mcq-option ">Linear Search</div>
+      <div class="mcq-option correct">✓ Binary Search</div>
+      <div class="mcq-option ">DFS</div>
+      <div class="mcq-option ">BFS</div>
+      <div class="explanation"><strong>Explanation:</strong> Interpolation Search improves Binary Search for uniformly distributed data by guessing the position instead of blindly picking the middle.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">B14. When is Insertion Sort highly efficient?</p>
+      <div class="mcq-option ">For huge arrays</div>
+      <div class="mcq-option ">For descending sorted arrays</div>
+      <div class="mcq-option correct">✓ For small or nearly sorted arrays</div>
+      <div class="mcq-option ">Never</div>
+      <div class="explanation"><strong>Explanation:</strong> Insertion Sort is extremely fast (O(n)) for small datasets or arrays that are already mostly sorted.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">B15. How do you assert equality in NUnit?</p>
+      <div class="mcq-option ">Assert.IsEqual()</div>
+      <div class="mcq-option ">Assert.Equals()</div>
+      <div class="mcq-option correct">✓ Assert.AreEqual()</div>
+      <div class="mcq-option ">Assert.True()</div>
+      <div class="explanation"><strong>Explanation:</strong> Assert.AreEqual(expected, actual) is the standard NUnit assertion to verify equality.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">B16. What is a multicast delegate?</p>
+      <div class="mcq-option ">A delegate returning an array</div>
+      <div class="mcq-option correct">✓ A delegate invoking multiple methods</div>
+      <div class="mcq-option ">A multi-threaded delegate</div>
+      <div class="mcq-option ">A generic delegate</div>
+      <div class="explanation"><strong>Explanation:</strong> A multicast delegate holds references to more than one method. When invoked, it calls all registered methods sequentially.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">B17. How many input parameters does a standard Predicate<T> take?</p>
+      <div class="mcq-option ">0</div>
+      <div class="mcq-option correct">✓ 1</div>
+      <div class="mcq-option ">2</div>
+      <div class="mcq-option ">Unlimited</div>
+      <div class="explanation"><strong>Explanation:</strong> Predicate<T> strictly takes exactly one parameter of type T to evaluate a condition.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">B18. What does FirstOrDefault() return if a sequence is empty?</p>
+      <div class="mcq-option ">Throws exception</div>
+      <div class="mcq-option correct">✓ null (for ref types) / default value</div>
+      <div class="mcq-option ">Empty string</div>
+      <div class="mcq-option ">-1</div>
+      <div class="explanation"><strong>Explanation:</strong> FirstOrDefault returns the type's default value (null for reference types, 0/false for value types) if no elements are found.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">B19. What does "where T : class" mean in generics?</p>
+      <div class="mcq-option ">T must be a value type</div>
+      <div class="mcq-option correct">✓ T must be a reference type</div>
+      <div class="mcq-option ">T must have a parameterless constructor</div>
+      <div class="mcq-option ">T is a base class</div>
+      <div class="explanation"><strong>Explanation:</strong> The class constraint requires that the type argument T must be a reference type (class, interface, delegate, or array).</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">B20. What is the default access modifier for class members in C#?</p>
+      <div class="mcq-option ">public</div>
+      <div class="mcq-option correct">✓ private</div>
+      <div class="mcq-option ">protected</div>
+      <div class="mcq-option ">internal</div>
+      <div class="explanation"><strong>Explanation:</strong> If no access modifier is specified, class members implicitly default to private.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-code">CODE (Logic: Find Missing Number)</span>
+      <p class="q-title">B21. Given an array containing n distinct numbers taken from 0, 1, 2, ..., n, find the one that is missing from the array.</p>
+      <pre><code class="language-csharp">public class Solution {
+    public int MissingNumber(int[] nums) {
+        int n = nums.Length;
+        int expectedSum = n * (n + 1) / 2;
+        int actualSum = 0;
+        foreach (int num in nums) {
+            actualSum += num;
+        }
+        return expectedSum - actualSum;
+    }
+}</code></pre>
+      <div class="stats">
+        <div class="stat">⏱ Time: O(N) - One pass through the array.</div>
+        <div class="stat">💾 Space: O(1) - Only integer variables are used.</div>
+      </div>
+      <div class="explanation">
+        <strong>Optimal Approach:</strong> Using Gauss' Formula for the sum of the first N numbers. We calculate the expected sum of 0 through N, then subtract the actual sum of the array. The difference is the missing number.<br><br>
+        <strong>Alternative Approach:</strong> Bitwise XOR approach: XOR all numbers from 0 to N, and XOR them with all numbers in the array. Since X ^ X = 0, the missing number remains. Also O(N) time and O(1) space, avoiding potential integer overflow for massive N.
+      </div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-code">CODE (Console App: Library Books)</span>
+      <p class="q-title">B22. Create a Library Management console application. It should allow adding books, viewing all books, and borrowing a book (changing its status).</p>
+      <pre><code class="language-csharp">using System;
+using System.Collections.Generic;
+
+namespace LibraryApp {
+    class Book {
+        public string Title { get; set; }
+        public bool IsBorrowed { get; set; }
+    }
+
+    class Program {
+        static void Main() {
+            var catalog = new Dictionary&lt;string, Book&gt; {
+                { "1984", new Book { Title = "1984", IsBorrowed = false } },
+                { "Dune", new Book { Title = "Dune", IsBorrowed = false } }
+            };
+
+            // Borrowing "Dune"
+            if (catalog.ContainsKey("Dune") && !catalog["Dune"].IsBorrowed) {
+                catalog["Dune"].IsBorrowed = true;
+                Console.WriteLine("Dune successfully borrowed.");
+            } else {
+                Console.WriteLine("Dune is unavailable.");
+            }
+
+            Console.WriteLine("\nLibrary Status:");
+            foreach (var b in catalog.Values) {
+                Console.WriteLine($"- {b.Title}: {(b.IsBorrowed ? "Borrowed" : "Available")}");
+            }
+        }
+    }
+}</code></pre>
+      <div class="stats">
+        <div class="stat">⏱ Time: O(1) for borrowing lookups, O(N) for printing the catalog.</div>
+        <div class="stat">💾 Space: O(N) to store books.</div>
+      </div>
+      <div class="explanation">
+        <strong>Optimal Approach:</strong> Uses a Dictionary mapped by Title (or ISBN) for instant O(1) lookups. A boolean flag manages the state of the book without removing it from the collection.<br><br>
+        <strong>Alternative Approach:</strong> A List<Book> could be used, but lookup for borrowing would take O(N) using LINQ FirstOrDefault.
+      </div>
+    </div>
+  </div>
+  <div id="set-C" class="set-content ">
+    <h2>Question Set C</h2>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">C1. Can a static class be instantiated using the new keyword?</p>
+      <div class="mcq-option ">Yes</div>
+      <div class="mcq-option correct">✓ No</div>
+      <div class="mcq-option ">Only internally</div>
+      <div class="mcq-option ">Only using reflection</div>
+      <div class="explanation"><strong>Explanation:</strong> Static classes cannot be instantiated. They can only contain static members and serve as utility containers.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">C2. In C#, LinkedList<T> is implemented as a:</p>
+      <div class="mcq-option ">Singly linked list</div>
+      <div class="mcq-option correct">✓ Doubly linked list</div>
+      <div class="mcq-option ">Circular array</div>
+      <div class="mcq-option ">Binary tree</div>
+      <div class="explanation"><strong>Explanation:</strong> LinkedList<T> in .NET is implemented as a Doubly Linked List, where each node has references to both next and previous nodes.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">C3. Which search algorithm works on unsorted arrays?</p>
+      <div class="mcq-option ">Binary Search</div>
+      <div class="mcq-option ">Interpolation Search</div>
+      <div class="mcq-option correct">✓ Linear Search</div>
+      <div class="mcq-option ">Exponential Search</div>
+      <div class="explanation"><strong>Explanation:</strong> Linear Search iterates from the start to the end, so it doesn't require the array to be sorted.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">C4. What is the auxiliary space complexity of Merge Sort?</p>
+      <div class="mcq-option ">O(1)</div>
+      <div class="mcq-option ">O(log n)</div>
+      <div class="mcq-option correct">✓ O(n)</div>
+      <div class="mcq-option ">O(n^2)</div>
+      <div class="explanation"><strong>Explanation:</strong> Merge Sort requires O(n) auxiliary space to temporarily hold merged elements before copying them back to the original array.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">C5. Which NUnit attribute runs a test multiple times with different arguments?</p>
+      <div class="mcq-option correct">✓ [TestCase]</div>
+      <div class="mcq-option ">[DataRow]</div>
+      <div class="mcq-option ">[Theory]</div>
+      <div class="mcq-option ">[Arguments]</div>
+      <div class="explanation"><strong>Explanation:</strong> [TestCase] allows you to write parameterized tests, running the same method multiple times with different inputs.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">C6. Is a delegate best described as a type-safe function pointer?</p>
+      <div class="mcq-option correct">✓ Yes</div>
+      <div class="mcq-option ">No</div>
+      <div class="mcq-option ">Only Action delegates</div>
+      <div class="mcq-option ">Only generic delegates</div>
+      <div class="explanation"><strong>Explanation:</strong> A delegate securely encapsulates a method reference along with an object instance (if instance method), ensuring type safety.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">C7. What is the maximum number of input parameters a Func delegate can have in .NET?</p>
+      <div class="mcq-option ">4</div>
+      <div class="mcq-option ">8</div>
+      <div class="mcq-option correct">✓ 16</div>
+      <div class="mcq-option ">Unlimited</div>
+      <div class="explanation"><strong>Explanation:</strong> The .NET framework defines Func delegates with up to 16 input parameters (Func<T1, ... T16, TResult>).</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">C8. Which operator is used for expression-bodied members?</p>
+      <div class="mcq-option correct">✓ =></div>
+      <div class="mcq-option ">:</div>
+      <div class="mcq-option ">-></div>
+      <div class="mcq-option ">::</div>
+      <div class="explanation"><strong>Explanation:</strong> The => (lambda) operator is used for expression-bodied members to concisely define properties or methods with a single expression.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">C9. Which LINQ method is used to group elements?</p>
+      <div class="mcq-option ">Group</div>
+      <div class="mcq-option correct">✓ GroupBy</div>
+      <div class="mcq-option ">Cluster</div>
+      <div class="mcq-option ">Partition</div>
+      <div class="explanation"><strong>Explanation:</strong> GroupBy groups elements that share a common key into an IGrouping collection.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">C10. Which keyword enables covariance in generic interfaces (like IEnumerable<out T>)?</p>
+      <div class="mcq-option ">in</div>
+      <div class="mcq-option correct">✓ out</div>
+      <div class="mcq-option ">ref</div>
+      <div class="mcq-option ">yield</div>
+      <div class="explanation"><strong>Explanation:</strong> The "out" keyword enables covariance, allowing you to use a more derived type than specified by the generic parameter.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">C11. Which keyword explicitly hides an inherited member from a base class?</p>
+      <div class="mcq-option ">hide</div>
+      <div class="mcq-option ">override</div>
+      <div class="mcq-option correct">✓ new</div>
+      <div class="mcq-option ">base</div>
+      <div class="explanation"><strong>Explanation:</strong> The new modifier explicitly hides a member inherited from a base class, suppressing compiler warnings about hiding.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">C12. Which collection provides O(1) average time complexity for lookups?</p>
+      <div class="mcq-option ">List</div>
+      <div class="mcq-option ">LinkedList</div>
+      <div class="mcq-option correct">✓ Dictionary</div>
+      <div class="mcq-option ">Array</div>
+      <div class="explanation"><strong>Explanation:</strong> Dictionary<TKey, TValue> provides O(1) average lookup time by computing hash codes for keys.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">C13. Which formula calculates the midpoint safely to avoid overflow in Binary Search?</p>
+      <div class="mcq-option ">(low+high)/2</div>
+      <div class="mcq-option correct">✓ low+(high-low)/2</div>
+      <div class="mcq-option ">high-(low+high)/2</div>
+      <div class="mcq-option ">low*high/2</div>
+      <div class="explanation"><strong>Explanation:</strong> low + (high - low) / 2 prevents potential integer overflow that can occur with (low + high) / 2 for very large indices.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">C14. Selection sort finds the minimum element and swaps it with the element at the...</p>
+      <div class="mcq-option ">End</div>
+      <div class="mcq-option correct">✓ Current beginning position</div>
+      <div class="mcq-option ">Middle</div>
+      <div class="mcq-option ">Random position</div>
+      <div class="explanation"><strong>Explanation:</strong> Selection sort scans the unsorted portion, finds the minimum, and swaps it into the current beginning position of the unsorted segment.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">C15. How do you assert that an exception is thrown in NUnit?</p>
+      <div class="mcq-option ">Assert.Exception()</div>
+      <div class="mcq-option correct">✓ Assert.Throws()</div>
+      <div class="mcq-option ">Assert.CatchError()</div>
+      <div class="mcq-option ">Assert.Fails()</div>
+      <div class="explanation"><strong>Explanation:</strong> Assert.Throws<ExceptionType>(() => ...) verifies that the provided lambda throws the exact exception type.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">C16. What is the return type of the Action delegate?</p>
+      <div class="mcq-option correct">✓ void</div>
+      <div class="mcq-option ">int</div>
+      <div class="mcq-option ">bool</div>
+      <div class="mcq-option ">object</div>
+      <div class="explanation"><strong>Explanation:</strong> The defining characteristic of an Action delegate is that it does not return a value (void).</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">C17. Can you pass a lambda expression to a LINQ Where() clause?</p>
+      <div class="mcq-option correct">✓ Yes</div>
+      <div class="mcq-option ">No</div>
+      <div class="mcq-option ">Only if it takes no parameters</div>
+      <div class="mcq-option ">Only if compiled</div>
+      <div class="explanation"><strong>Explanation:</strong> Yes, LINQ methods like Where heavily rely on lambda expressions passed as Func<TSource, bool> delegates.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">C18. When querying a database with Entity Framework, which interface is preferred for server-side evaluation?</p>
+      <div class="mcq-option ">IEnumerable</div>
+      <div class="mcq-option ">IList</div>
+      <div class="mcq-option correct">✓ IQueryable</div>
+      <div class="mcq-option ">ICollection</div>
+      <div class="explanation"><strong>Explanation:</strong> IQueryable allows the LINQ provider (like EF Core) to translate the query into SQL and execute it on the server, saving memory.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">C19. What is Boxing in C#?</p>
+      <div class="mcq-option ">Ref type to Value type</div>
+      <div class="mcq-option correct">✓ Value type to Ref type</div>
+      <div class="mcq-option ">Casting arrays</div>
+      <div class="mcq-option ">Packing assemblies</div>
+      <div class="explanation"><strong>Explanation:</strong> Boxing is the process of implicitly or explicitly converting a value type (like int) to the reference type object.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">C20. What is the correct syntax to call a generic method?</p>
+      <div class="mcq-option ">Method[T]()</div>
+      <div class="mcq-option correct">✓ Method<T>()</div>
+      <div class="mcq-option ">Method(T)()</div>
+      <div class="mcq-option ">Method{T}()</div>
+      <div class="explanation"><strong>Explanation:</strong> Generic methods are called by specifying the type arguments in angle brackets <T> immediately after the method name.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-code">CODE (Logic: Two Sum)</span>
+      <p class="q-title">C21. Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.</p>
+      <pre><code class="language-csharp">using System.Collections.Generic;
+
+public class Solution {
+    public int[] TwoSum(int[] nums, int target) {
+        var dict = new Dictionary&lt;int, int&gt;();
+        for (int i = 0; i &lt; nums.Length; i++) {
+            int complement = target - nums[i];
+            if (dict.ContainsKey(complement)) {
+                return new int[] { dict[complement], i };
+            }
+            if (!dict.ContainsKey(nums[i])) {
+                dict.Add(nums[i], i);
+            }
+        }
+        return new int[0];
+    }
+}</code></pre>
+      <div class="stats">
+        <div class="stat">⏱ Time: O(N) - Single pass through the array.</div>
+        <div class="stat">💾 Space: O(N) - Dictionary stores at most N elements.</div>
+      </div>
+      <div class="explanation">
+        <strong>Optimal Approach:</strong> Uses a Hash Map (Dictionary) to store the value and its index. As we iterate, we check if the required complement (target - current) already exists in the dictionary. If yes, we found the pair immediately.<br><br>
+        <strong>Alternative Approach:</strong> Brute force approach using nested loops. Check every possible pair. Time complexity O(N^2), Space O(1). Highly inefficient for large arrays.
+      </div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-code">CODE (Console App: Bank Account)</span>
+      <p class="q-title">C22. Build a Console App for a Bank Account. Users should be able to Deposit, Withdraw, and Check Balance. Prevent withdrawing more than the balance.</p>
+      <pre><code class="language-csharp">using System;
+
+namespace BankApp {
+    class Account {
+        public decimal Balance { get; private set; }
+        
+        public void Deposit(decimal amount) {
+            if (amount &gt; 0) Balance += amount;
+        }
+
+        public bool Withdraw(decimal amount) {
+            if (amount &gt; 0 && Balance &gt;= amount) {
+                Balance -= amount;
+                return true;
+            }
+            return false;
+        }
+    }
+
+    class Program {
+        static void Main() {
+            Account acc = new Account();
+            acc.Deposit(500);
+            Console.WriteLine($"Deposited 500. Balance: {acc.Balance}");
+            
+            bool success = acc.Withdraw(600);
+            Console.WriteLine($"Withdraw 600 Success: {success}. Balance: {acc.Balance}");
+            
+            acc.Withdraw(200);
+            Console.WriteLine($"Withdraw 200 Success. Balance: {acc.Balance}");
+        }
+    }
+}</code></pre>
+      <div class="stats">
+        <div class="stat">⏱ Time: O(1) for operations.</div>
+        <div class="stat">💾 Space: O(1) for memory usage.</div>
+      </div>
+      <div class="explanation">
+        <strong>Optimal Approach:</strong> Encapsulates the Balance property with a private setter so it can only be modified securely via Deposit and Withdraw methods, enforcing business rules (no overdrafts).<br><br>
+        <strong>Alternative Approach:</strong> If transaction history was required, a List<Transaction> could log every deposit/withdrawal, and balance could be calculated as the sum of transactions.
+      </div>
+    </div>
+  </div>
+  <div id="set-D" class="set-content ">
+    <h2>Question Set D</h2>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">D1. An abstract method must be declared inside an...</p>
+      <div class="mcq-option ">Interface</div>
+      <div class="mcq-option correct">✓ Abstract class</div>
+      <div class="mcq-option ">Static class</div>
+      <div class="mcq-option ">Sealed class</div>
+      <div class="explanation"><strong>Explanation:</strong> Abstract methods do not provide an implementation and thus can only exist within an Abstract class or interface.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">D2. Which namespace contains thread-safe collections like ConcurrentDictionary?</p>
+      <div class="mcq-option ">System.Threading</div>
+      <div class="mcq-option ">System.Collections.Generic</div>
+      <div class="mcq-option correct">✓ System.Collections.Concurrent</div>
+      <div class="mcq-option ">System.Linq</div>
+      <div class="explanation"><strong>Explanation:</strong> System.Collections.Concurrent contains thread-safe collections designed to be accessed from multiple threads concurrently without explicit locking.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">D3. What is the average time complexity for searching an element in a HashSet?</p>
+      <div class="mcq-option correct">✓ O(1)</div>
+      <div class="mcq-option ">O(n)</div>
+      <div class="mcq-option ">O(log n)</div>
+      <div class="mcq-option ">O(n^2)</div>
+      <div class="explanation"><strong>Explanation:</strong> A HashSet provides O(1) average time complexity for searching because it directly hashes the value to find its bucket.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">D4. Which sorting algorithm is primarily used internally by Array.Sort() in .NET?</p>
+      <div class="mcq-option ">Merge Sort</div>
+      <div class="mcq-option correct">✓ Introspective Sort (Introsort)</div>
+      <div class="mcq-option ">Bubble Sort</div>
+      <div class="mcq-option ">Radix Sort</div>
+      <div class="explanation"><strong>Explanation:</strong> Array.Sort uses Introspective Sort (Introsort), which begins with Quick Sort and switches to Heap Sort if recursion depth gets too large.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">D5. Which NUnit attribute is used to mark a class that contains test methods?</p>
+      <div class="mcq-option ">[TestClass]</div>
+      <div class="mcq-option correct">✓ [TestFixture]</div>
+      <div class="mcq-option ">[TestSuite]</div>
+      <div class="mcq-option ">[Tests]</div>
+      <div class="explanation"><strong>Explanation:</strong> [TestFixture] is an attribute used to mark a class that contains setup/teardown logic and test methods in NUnit.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">D6. Events in C# are fundamentally based on which language feature?</p>
+      <div class="mcq-option ">Interfaces</div>
+      <div class="mcq-option correct">✓ Delegates</div>
+      <div class="mcq-option ">Enums</div>
+      <div class="mcq-option ">Structs</div>
+      <div class="explanation"><strong>Explanation:</strong> Events are essentially a wrapper around multicast delegates, providing restricted access (only += and -= from outside the class).</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">D7. In the Func delegate signature, where is the return type placed?</p>
+      <div class="mcq-option ">First parameter</div>
+      <div class="mcq-option correct">✓ Last parameter</div>
+      <div class="mcq-option ">It has no return type</div>
+      <div class="mcq-option ">Anywhere</div>
+      <div class="explanation"><strong>Explanation:</strong> The signature of Func places the return type as the very last generic parameter.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">D8. What is the primary advantage of Lambda Expressions over Anonymous Methods?</p>
+      <div class="mcq-option ">Faster execution</div>
+      <div class="mcq-option correct">✓ More concise syntax</div>
+      <div class="mcq-option ">Supports multiple return types</div>
+      <div class="mcq-option ">Uses less memory</div>
+      <div class="explanation"><strong>Explanation:</strong> Lambda expressions provide a much more concise, readable syntax compared to older C# 2.0 anonymous method delegate blocks.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">D9. Which LINQ method combines elements from two collections based on matching keys?</p>
+      <div class="mcq-option ">Concat</div>
+      <div class="mcq-option ">Merge</div>
+      <div class="mcq-option correct">✓ Join</div>
+      <div class="mcq-option ">Union</div>
+      <div class="explanation"><strong>Explanation:</strong> The Join method correlates the elements of two sequences based on matching keys, similar to an SQL INNER JOIN.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">D10. Which keyword enables contravariance in generic interfaces (like Action<in T>)?</p>
+      <div class="mcq-option ">out</div>
+      <div class="mcq-option ">ref</div>
+      <div class="mcq-option correct">✓ in</div>
+      <div class="mcq-option ">params</div>
+      <div class="explanation"><strong>Explanation:</strong> The "in" keyword enables contravariance, meaning you can use a less derived type than specified by the generic parameter.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">D11. What is the effect of marking a class as sealed?</p>
+      <div class="mcq-option ">It cannot be instantiated</div>
+      <div class="mcq-option correct">✓ It cannot be inherited</div>
+      <div class="mcq-option ">It cannot have methods</div>
+      <div class="mcq-option ">It must be static</div>
+      <div class="explanation"><strong>Explanation:</strong> A sealed class cannot be inherited by another class, ensuring its implementation cannot be altered via inheritance.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">D12. What is a major difference between Array and List<T>?</p>
+      <div class="mcq-option ">Array is reference type, List is value type</div>
+      <div class="mcq-option correct">✓ Array has fixed size, List resizes dynamically</div>
+      <div class="mcq-option ">Array stores objects, List stores strings</div>
+      <div class="mcq-option ">No difference</div>
+      <div class="explanation"><strong>Explanation:</strong> Arrays have a fixed size upon creation. List<T> dynamically allocates an internal array and resizes it as elements are added.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">D13. Breadth-First Search (BFS) typically uses which collection?</p>
+      <div class="mcq-option ">Stack</div>
+      <div class="mcq-option correct">✓ Queue</div>
+      <div class="mcq-option ">Dictionary</div>
+      <div class="mcq-option ">HashSet</div>
+      <div class="explanation"><strong>Explanation:</strong> BFS uses a Queue to process nodes level by level (FIFO).</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">D14. Which of the following sorting algorithms is Stable by default?</p>
+      <div class="mcq-option ">Quick Sort</div>
+      <div class="mcq-option ">Selection Sort</div>
+      <div class="mcq-option correct">✓ Merge Sort</div>
+      <div class="mcq-option ">Heap Sort</div>
+      <div class="explanation"><strong>Explanation:</strong> Merge Sort is a stable sort, meaning two elements with equal keys appear in the same order in sorted output as they did in the input.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">D15. How do you mark a test to be skipped in NUnit?</p>
+      <div class="mcq-option ">[Skip]</div>
+      <div class="mcq-option correct">✓ [Ignore]</div>
+      <div class="mcq-option ">[Disable]</div>
+      <div class="mcq-option ">[Omit]</div>
+      <div class="explanation"><strong>Explanation:</strong> [Ignore("Reason")] marks a test method to be skipped during test execution.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">D16. How many input parameters does Func<TResult> take?</p>
+      <div class="mcq-option ">1</div>
+      <div class="mcq-option ">2</div>
+      <div class="mcq-option correct">✓ 0</div>
+      <div class="mcq-option ">Unlimited</div>
+      <div class="explanation"><strong>Explanation:</strong> Func<TResult> takes 0 input parameters and simply returns a value of type TResult.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">D17. What is a closure in the context of lambdas?</p>
+      <div class="mcq-option ">Closing a database connection</div>
+      <div class="mcq-option correct">✓ A lambda capturing outer variables</div>
+      <div class="mcq-option ">A self-executing lambda</div>
+      <div class="mcq-option ">A lambda with no body</div>
+      <div class="explanation"><strong>Explanation:</strong> A closure occurs when a lambda expression captures and uses local variables from its enclosing scope, prolonging their lifetime.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">D18. Does LINQ use deferred (lazy) execution for methods like Where and Select?</p>
+      <div class="mcq-option correct">✓ Yes</div>
+      <div class="mcq-option ">No</div>
+      <div class="mcq-option ">Only for arrays</div>
+      <div class="mcq-option ">Only in C# 10</div>
+      <div class="explanation"><strong>Explanation:</strong> Yes, deferred execution means LINQ queries are not evaluated until you iterate over them (e.g., via foreach or ToList()).</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">D19. What is the syntax for a nullable value type in C#?</p>
+      <div class="mcq-option ">int?</div>
+      <div class="mcq-option ">Nullable<int></div>
+      <div class="mcq-option correct">✓ Both A and B</div>
+      <div class="mcq-option ">int!</div>
+      <div class="explanation"><strong>Explanation:</strong> Both int? and Nullable<int> represent a value type that can hold null.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-mcq">MCQ</span>
+      <p class="q-title">D20. What does the constraint "where T : new()" require?</p>
+      <div class="mcq-option ">T must be a new class</div>
+      <div class="mcq-option ">T must be allocated on the heap</div>
+      <div class="mcq-option correct">✓ T must have a public parameterless constructor</div>
+      <div class="mcq-option ">T must be abstract</div>
+      <div class="explanation"><strong>Explanation:</strong> The "new()" constraint ensures that the generic type argument must have an accessible, parameterless constructor so instances can be created inside generic methods.</div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-code">CODE (Logic: Valid Parentheses)</span>
+      <p class="q-title">D21. Given a string containing just the characters "(", ")", "{", "}", "[" and "]", determine if the input string is valid.</p>
+      <pre><code class="language-csharp">using System.Collections.Generic;
+
+public class Solution {
+    public bool IsValid(string s) {
+        Stack&lt;char&gt; stack = new Stack&lt;char&gt;();
+        foreach (char c in s) {
+            if (c == '(') stack.Push(')');
+            else if (c == '{') stack.Push('}');
+            else if (c == '[') stack.Push(']');
+            else if (stack.Count == 0 || stack.Pop() != c) return false;
+        }
+        return stack.Count == 0;
+    }
+}</code></pre>
+      <div class="stats">
+        <div class="stat">⏱ Time: O(N) - Single pass over the string.</div>
+        <div class="stat">💾 Space: O(N) - Stack can grow to N/2 elements.</div>
+      </div>
+      <div class="explanation">
+        <strong>Optimal Approach:</strong> A Stack is perfect for matching nested pairs. When we encounter an opening bracket, we push its corresponding closing bracket to the stack. When we see a closing bracket, we pop the stack and ensure it matches. If it doesn't, or the stack is empty prematurely, the string is invalid.<br><br>
+        <strong>Alternative Approach:</strong> A slow alternative involves repeatedly using string.Replace("()", "") until the string stops changing. This is O(N^2) time.
+      </div>
+    </div>
+    <div class="question-card">
+      <span class="badge badge-code">CODE (Console App: Student Attendance)</span>
+      <p class="q-title">D22. Build a Student Attendance System in a Console App. Allow marking students present or absent and viewing the attendance report for the day.</p>
+      <pre><code class="language-csharp">using System;
+using System.Collections.Generic;
+
+namespace AttendanceApp {
+    class Program {
+        static void Main() {
+            var attendance = new Dictionary&lt;string, bool&gt; {
+                { "John", false },
+                { "Jane", false }
+            };
+
+            // Mark Jane present
+            if (attendance.ContainsKey("Jane")) {
+                attendance["Jane"] = true;
+            }
+
+            Console.WriteLine("Daily Attendance Report:");
+            foreach(var kvp in attendance) {
+                Console.WriteLine($"- {kvp.Key}: {(kvp.Value ? "Present" : "Absent")}");
+            }
+        }
+    }
+}</code></pre>
+      <div class="stats">
+        <div class="stat">⏱ Time: O(1) for updates, O(N) for reporting.</div>
+        <div class="stat">💾 Space: O(N) for storing the roster.</div>
+      </div>
+      <div class="explanation">
+        <strong>Optimal Approach:</strong> Uses a Dictionary tracking Student Name -> Boolean status. Fast O(1) updates for marking presence.<br><br>
+        <strong>Alternative Approach:</strong> Using a HashSet to store *only* present students. Space complexity becomes proportional to present students rather than total students.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showTab(set) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.set-content').forEach(div => div.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById('set-' + set).classList.add('active');
+    }
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+</body>
+</html>
