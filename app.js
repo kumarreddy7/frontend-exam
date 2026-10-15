@@ -1,598 +1,883 @@
 /**
  * app.js
- * ─────────────────────────────────────────────────────────
- * Exam Engine · Anti-Cheat · Evaluator · Submission
- * ─────────────────────────────────────────────────────────
+ * Assessment Engine for Infosys 2026 Batch Pseudo-Code Exam
+ * Features:
+ * - 30-min shared timer (time carry-over across sections)
+ * - Section-wise & per-question time tracking
+ * - Real-time question palette with status tracking
+ * - In-depth post-exam review with step-by-step explanations
+ * - Diagnostic focus area recommendations & preparation tips
  */
 
 "use strict";
+
+const ExamState = {
+  name: "",
+  rollNo: "",
+  currentQIndex: 0,
+  answers: {},       // { [qId]: 'A' | 'B' | 'C' | 'D' }
+  reviewed: {},      // { [qId]: boolean }
+  visited: {},       // { [qId]: boolean }
+  timeSpent: {},     // { [qId]: seconds }
+  activeQuestionStartTime: null,
+  startTime: null,
+  endTime: null,
+  submitted: false,
+  tabSwitches: 0,
+  timerInterval: null,
+  questionTimerInterval: null,
+  remainingSeconds: 30 * 60, // 30 minutes
+};
+
+// ═══════════════════════════════════════════════════════════
+// SCREEN MANAGEMENT
+// ═══════════════════════════════════════════════════════════
+function showScreen(screenId) {
+  document.querySelectorAll(".screen").forEach((s) => s.classList.remove("active"));
+  const target = document.getElementById("screen-" + screenId);
+  if (target) {
+    target.classList.add("active");
+    window.scrollTo(0, 0);
+  }
+}
 
 // ═══════════════════════════════════════════════════════════
 // ANTI-CHEAT MODULE
 // ═══════════════════════════════════════════════════════════
 const AntiCheat = (() => {
-  let tabSwitches = 0;
-  let examStarted = false;
-  let dismissed = false;
+  let active = false;
 
   function init() {
-    examStarted = true;
+    active = true;
 
-    // Right-click
     if (ExamConfig.DISABLE_RIGHTCLICK) {
       document.addEventListener("contextmenu", (e) => e.preventDefault());
     }
 
-    // Copy/paste
     if (ExamConfig.DISABLE_COPY) {
       document.addEventListener("copy", (e) => e.preventDefault());
       document.addEventListener("paste", (e) => e.preventDefault());
       document.addEventListener("cut", (e) => e.preventDefault());
     }
 
-    // Tab visibility
-    document.addEventListener("visibilitychange", () => {
-      if (!examStarted || document.visibilityState !== "hidden") return;
-      tabSwitches++;
-      _updateTabWarn();
-      if (tabSwitches >= ExamConfig.MAX_TAB_SWITCHES) {
-        _showOverlay();
-      }
-      // Log switch
-      ExamState.tabSwitches = tabSwitches;
-    });
-
-    // DevTools heuristic (size-based)
-    if (ExamConfig.DETECT_DEVTOOLS) {
-      setInterval(_detectDevtools, 3000);
-    }
-
-    // Keyboard shortcuts block
+    // Keyboard shortcut prevention (F12, Ctrl+U, etc.)
     document.addEventListener("keydown", (e) => {
-      // Block F12
       if (e.key === "F12") e.preventDefault();
-      // Block Ctrl+Shift+I/J/C
-      if (
-        e.ctrlKey &&
-        e.shiftKey &&
-        ["I", "J", "C", "i", "j", "c"].includes(e.key)
-      )
-        e.preventDefault();
-      // Block Ctrl+U (view source)
+      if (e.ctrlKey && e.shiftKey && ["I", "J", "C", "i", "j", "c"].includes(e.key)) e.preventDefault();
       if (e.ctrlKey && ["u", "U"].includes(e.key)) e.preventDefault();
     });
+
+    // Tab visibility detection
+    document.addEventListener("visibilitychange", () => {
+      if (!active || ExamState.submitted) return;
+      if (document.visibilityState === "hidden") {
+        ExamState.tabSwitches++;
+        updateTabWarning();
+        if (ExamState.tabSwitches >= ExamConfig.MAX_TAB_SWITCHES) {
+          showTabOverlay();
+        }
+      }
+    });
   }
 
-  function _detectDevtools() {
-    const threshold = 160;
-    if (
-      window.outerWidth - window.innerWidth > threshold ||
-      window.outerHeight - window.innerHeight > threshold
-    ) {
-      ExamState.devtoolsOpened = true;
-    }
-  }
-
-  function _updateTabWarn() {
-    const el = document.getElementById("tab-warn");
+  function updateTabWarning() {
+    const el = document.getElementById("tab-warn-badge");
     if (!el) return;
-    el.textContent = `Tab switches: ${tabSwitches}/${ExamConfig.MAX_TAB_SWITCHES}`;
-    el.style.color =
-      tabSwitches >= ExamConfig.MAX_TAB_SWITCHES - 1 ? "#ff3366" : "#555";
-  }
-
-  function _showOverlay() {
-    document.getElementById("cheat-overlay").classList.add("show");
-  }
-
-  function dismiss() {
-    document.getElementById("cheat-overlay").classList.remove("show");
-  }
-
-  return { init, dismiss };
-})();
-
-// ═══════════════════════════════════════════════════════════
-// EXAM STATE
-// ═══════════════════════════════════════════════════════════
-const ExamState = {
-  studentName: "",
-  token: "",
-  tokenHash: "",
-  setId: "",
-  questions: [],
-  startTime: null,
-  endTime: null,
-  submitted: false,
-  timerHandle: null,
-  tabSwitches: 0,
-  devtoolsOpened: false,
-  scores: {}, // { qId: 10|0 }
-};
-
-// ═══════════════════════════════════════════════════════════
-// TIMER MODULE
-// ═══════════════════════════════════════════════════════════
-const Timer = (() => {
-  let endAt = 0;
-
-  function start(minutes, onExpiry) {
-    endAt = Date.now() + minutes * 60 * 1000;
-    ExamState.timerHandle = setInterval(() => {
-      const remaining = endAt - Date.now();
-      if (remaining <= 0) {
-        clearInterval(ExamState.timerHandle);
-        _render(0);
-        onExpiry();
-        return;
-      }
-      _render(remaining);
-    }, 500);
-    _render(minutes * 60 * 1000);
-  }
-
-  function stop() {
-    clearInterval(ExamState.timerHandle);
-  }
-
-  function _render(ms) {
-    const el = document.getElementById("timer");
-    const s = Math.max(0, Math.floor(ms / 1000));
-    const m = Math.floor(s / 60);
-    const sec = s % 60;
-    el.textContent = `${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
-    el.className = s > 300 ? "" : s > 60 ? "warn" : "danger";
-  }
-
-  return { start, stop };
-})();
-
-// ═══════════════════════════════════════════════════════════
-// EVALUATION ENGINE
-// ═══════════════════════════════════════════════════════════
-const Evaluator = (() => {
-  // Run all questions and compute score
-  async function evaluateAll() {
-    const qs = ExamState.questions;
-    const results = [];
-    let totalScore = 0;
-
-    for (const q of qs) {
-      let result = { pass: false, feedback: "" };
-      let marks = 0;
-
-      if (q.type === 'mcq') {
-        const selected = document.querySelector(`input[name="q-${q.id}"]:checked`);
-        let answerText = selected ? selected.value : "";
-        if (selected && selected.value === q.correctAnswer) {
-          result = { pass: true, feedback: "Correct", answer: answerText };
-          marks = 1;
-        } else if (selected) {
-          result = { pass: false, feedback: `Incorrect. (Ans: ${q.correctAnswer})`, answer: answerText };
-          marks = 0;
-        } else {
-          result = { pass: false, feedback: "Not Answered", answer: "Not Answered" };
-          marks = 0;
-        }
-      } else if (q.type === 'code') {
-        const editor = window.monacoEditors ? window.monacoEditors[q.id] : null;
-        const code = editor ? editor.getValue() : "";
-        result = { pass: true, feedback: "Submitted for manual review", answer: code };
-        marks = 0; // Manual grading will evaluate these
-      }
-
-      ExamState.scores[q.id] = marks;
-      totalScore += marks;
-      results.push({ q, result });
-    }
-
-    return { results, total: totalScore, marks: Object.values(ExamState.scores) };
-  }
-
-  return { evaluateAll };
-})();
-
-// ═══════════════════════════════════════════════════════════
-// GOOGLE SHEETS SUBMISSION
-// ═══════════════════════════════════════════════════════════
-const Submission = (() => {
-  async function submit(total, results) {
-    const payload = {
-      name: ExamState.studentName,
-      token: ExamState.token,
-      tokenHash: ExamState.tokenHash,
-      score: total,
-      setId: ExamState.setId,
-      details: JSON.stringify(
-        results.map((r) => ({
-          id: r.q.id,
-          title: r.q.title,
-          pass: r.result.pass,
-          marks: ExamState.scores[r.q.id],
-          answer: r.result.answer,
-        })),
-      ),
-      tabSwitches: ExamState.tabSwitches,
-      devtools: ExamState.devtoolsOpened,
-      timestamp: new Date().toISOString(),
-      duration: Math.round((Date.now() - ExamState.startTime) / 1000),
-    };
-
-    // GAS requires the data sent as a URL query string via GET,
-    // OR as a form POST. We use an invisible form POST (no-cors safe).
-    try {
-      // Method 1: form submission via hidden iframe (most reliable with GAS)
-      await _formPost(ExamConfig.APPS_SCRIPT_URL, payload);
-      return { ok: true };
-    } catch (err) {
-      console.error("Submission failed:", err);
-      // Method 2: fallback GET with data in URL params
-      try {
-        await _getRequest(ExamConfig.APPS_SCRIPT_URL, payload);
-        return { ok: true };
-      } catch (err2) {
-        return { ok: false, error: err2.message };
+    if (ExamState.tabSwitches > 0) {
+      el.style.display = "inline-flex";
+      el.textContent = `Tab Switches: ${ExamState.tabSwitches}/${ExamConfig.MAX_TAB_SWITCHES}`;
+      if (ExamState.tabSwitches >= ExamConfig.MAX_TAB_SWITCHES) {
+        el.className = "warning-badge danger";
+      } else {
+        el.className = "warning-badge";
       }
     }
   }
 
-  // Send data via a hidden form POST into a hidden iframe
-  // This bypasses CORS entirely — browser posts, GAS receives
-  function _formPost(url, data) {
-    return new Promise((resolve) => {
-      const iframe = document.createElement("iframe");
-      iframe.name = "hidden_submit_" + Date.now();
-      iframe.style.cssText = "display:none;position:absolute;";
-      document.body.appendChild(iframe);
-
-      const form = document.createElement("form");
-      form.method = "POST";
-      form.action = url;
-      form.target = iframe.name;
-      form.style.display = "none";
-
-      // Add each field as a hidden input
-      Object.entries(data).forEach(([key, value]) => {
-        const input = document.createElement("input");
-        input.type = "hidden";
-        input.name = key;
-        input.value = String(value);
-        form.appendChild(input);
-      });
-
-      document.body.appendChild(form);
-      form.submit();
-
-      // GAS processes async — wait 4s then resolve
-      setTimeout(() => {
-        try {
-          document.body.removeChild(form);
-        } catch (e) {}
-        try {
-          document.body.removeChild(iframe);
-        } catch (e) {}
-        resolve({ ok: true });
-      }, 4000);
-    });
+  function showTabOverlay() {
+    const overlay = document.getElementById("cheat-overlay");
+    if (overlay) overlay.classList.add("show");
   }
 
-  // Fallback: GET request with params (GAS doGet must handle this)
-  function _getRequest(url, data) {
-    return new Promise((resolve, reject) => {
-      const params = new URLSearchParams(data).toString();
-      const img = new Image();
-      img.onload = img.onerror = () => resolve({ ok: true });
-      img.src = `${url}?${params}`;
-      setTimeout(() => resolve({ ok: true }), 5000);
-    });
+  function dismissOverlay() {
+    const overlay = document.getElementById("cheat-overlay");
+    if (overlay) overlay.classList.remove("show");
   }
 
-  return { submit };
+  return { init, dismissOverlay };
 })();
 
 // ═══════════════════════════════════════════════════════════
-// SCREEN MANAGER
-// ═══════════════════════════════════════════════════════════
-function showScreen(id) {
-  document
-    .querySelectorAll(".screen")
-    .forEach((s) => s.classList.remove("active"));
-  document.getElementById("screen-" + id).classList.add("active");
-}
-
-// ═══════════════════════════════════════════════════════════
-// EXAM RENDERER
-// ═══════════════════════════════════════════════════════════
-function renderQuestions(questions) {
-  const container = document.getElementById("questions-container");
-  container.innerHTML = "";
-  window.monacoEditors = {};
-
-  questions.forEach((q, i) => {
-    const card = document.createElement("div");
-    card.className = "question-card";
-    card.id = `qcard-${q.id}`;
-
-    if (q.type === 'mcq') {
-      let optionsHtml = '';
-      q.options.forEach(opt => {
-        optionsHtml += `
-          <label style="display:flex; align-items:center; gap:8px; font-family:var(--sans); font-size:14px; text-transform:none; margin:8px 0; color:var(--text); cursor:pointer;">
-            <input type="radio" name="q-${q.id}" value="${opt}" style="width:auto; margin:0; cursor:pointer;">
-            ${opt}
-          </label>`;
-      });
-
-      card.innerHTML = `
-        <div class="q-header">
-          <div class="q-num">Q${i + 1}</div>
-          <div class="q-title" style="white-space: pre-wrap;">${q.title}</div>
-          <div class="q-marks">1 mark</div>
-        </div>
-        <div class="q-desc" style="border-bottom:none;">
-          ${optionsHtml}
-        </div>
-      `;
-    } else if (q.type === 'code') {
-      card.innerHTML = `
-        <div class="q-header">
-          <div class="q-num">Q${i + 1}</div>
-          <div class="q-title">${q.title}</div>
-          <div class="q-marks">15 marks</div>
-        </div>
-        <div class="q-desc" style="white-space: pre-wrap;">${q.description}</div>
-        <div class="q-workspace" style="display:block; min-height:400px; padding: 10px;">
-          <div class="pane-label" style="margin-bottom: 10px;">C# Editor (Monaco)</div>
-          <div id="editor-${q.id}" style="height:350px; width:100%; border: 1px solid var(--border);"></div>
-        </div>
-      `;
-    }
-
-    container.appendChild(card);
-
-    if (q.type === 'code') {
-      const initMonaco = () => {
-        if (window.monaco) {
-          window.monacoEditors[q.id] = monaco.editor.create(document.getElementById(`editor-${q.id}`), {
-            value: q.starterCode || "// Write your C# code here\n",
-            language: 'csharp',
-            theme: 'vs-dark',
-            minimap: { enabled: false },
-            automaticLayout: true
-          });
-        } else {
-          setTimeout(initMonaco, 500);
-        }
-      };
-      initMonaco();
-    }
-  });
-}
-
-// ═══════════════════════════════════════════════════════════
-// RESULT RENDERER
-// ═══════════════════════════════════════════════════════════
-function renderResult(total, results) {
-  document.getElementById("final-score").textContent = total;
-
-  const bd = document.getElementById("score-breakdown");
-  let html = "";
-  results.forEach((r, i) => {
-    const m = ExamState.scores[r.q.id];
-    html += `
-      <div class="breakdown-row">
-        <span class="label">Q${i + 1}: ${r.q.title}</span>
-        <span class="val ${r.result.pass ? "green" : "red"}">${m} / 10 — ${r.result.feedback}</span>
-      </div>`;
-  });
-
-  // Show which questions were counted
-  const sortedIds = [...ExamState.questions]
-    .sort(
-      (a, b) => (ExamState.scores[b.id] || 0) - (ExamState.scores[a.id] || 0),
-    )
-    .slice(0, ExamConfig.BEST_N_QUESTIONS)
-    .map((q) => q.id);
-
-  html += `
-    <div class="breakdown-row" style="margin-top:8px;border-top:1px solid #333;padding-top:8px;">
-      <span class="label">Best ${ExamConfig.BEST_N_QUESTIONS} counted</span>
-      <span class="val">${sortedIds.join(", ")}</span>
-    </div>
-    <div class="breakdown-row">
-      <span class="label">Tab switches</span>
-      <span class="val ${ExamState.tabSwitches > 0 ? "red" : "green"}">${ExamState.tabSwitches}</span>
-    </div>`;
-
-  bd.innerHTML = html;
-}
-
-// ═══════════════════════════════════════════════════════════
-// MAIN EXAM APP
+// EXAM APP CONTROLLER
 // ═══════════════════════════════════════════════════════════
 const ExamApp = {
-  // ── Start Exam ────────────────────────────────────────
-  async startExam() {
-    const nameEl = document.getElementById("inp-name");
-    const tokenEl = document.getElementById("inp-token");
-    const errEl = document.getElementById("login-error");
-    const btn = document.getElementById("btn-start");
+  // Step 1: Validate login and move to instructions
+  proceedToInstructions() {
+    const nameInput = document.getElementById("input-name");
+    const rollInput = document.getElementById("input-roll");
+    const errorEl = document.getElementById("login-error");
 
-    const name = nameEl.value.trim();
-    const token = tokenEl.value.trim();
+    const name = nameInput.value.trim();
+    const roll = rollInput.value.trim();
 
-    errEl.style.display = "none";
-
-    if (!name) return _loginError("Please enter your full name.");
-    if (!token) return _loginError("Please enter your access token.");
-
-    if (ExamConfig.ENFORCE_TIME_WINDOW && !ExamConfig.BYPASS_TIME_CHECK) {
-      const now = new Date();
-      const localDateStr = now.getFullYear() + "-" + String(now.getMonth()+1).padStart(2,'0') + "-" + String(now.getDate()).padStart(2,'0');
-      
-      if (localDateStr !== ExamConfig.EXAM_DATE) {
-        return _loginError(`Exam is only available on ${ExamConfig.EXAM_DATE}.`);
-      }
-      
-      const currentMinutes = now.getHours() * 60 + now.getMinutes();
-      const startParts = ExamConfig.EXAM_START_TIME.split(":");
-      const startMinutes = parseInt(startParts[0]) * 60 + parseInt(startParts[1]);
-      const endParts = ExamConfig.EXAM_END_TIME.split(":");
-      const endMinutes = parseInt(endParts[0]) * 60 + parseInt(endParts[1]);
-      
-      if (currentMinutes < startMinutes) {
-        return _loginError(`Exam starts at ${ExamConfig.EXAM_START_TIME}.`);
-      }
-      if (currentMinutes > endMinutes) {
-        return _loginError(`Exam ended at ${ExamConfig.EXAM_END_TIME}.`);
-      }
+    if (!name || !roll) {
+      errorEl.textContent = "Please enter both your Full Name and Roll Number.";
+      errorEl.style.display = "block";
+      return;
     }
 
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span>Verifying...';
+    errorEl.style.display = "none";
+    ExamState.name = name;
+    ExamState.rollNo = roll;
 
-    // Hash & validate token
-    const { valid, hash } = await ExamConfig.validateToken(token);
+    // Update candidate details on instructions screen
+    document.getElementById("instr-candidate-name").textContent = name;
+    document.getElementById("instr-candidate-roll").textContent = roll;
 
-    if (!valid) {
-      btn.disabled = false;
-      btn.textContent = "Verify & Start Exam";
-      return _loginError("Invalid token. Contact your instructor.");
-    }
+    showScreen("instructions");
+  },
 
-    // Check if already submitted (localStorage guard)
-    const usedKey = `exam_used_${hash}`;
-    if (localStorage.getItem(usedKey)) {
-      btn.disabled = false;
-      btn.textContent = "Verify & Start Exam";
-      return _loginError(
-        "This token has already been used. Duplicate submissions are not allowed.",
-      );
-    }
+  backToLogin() {
+    showScreen("login");
+  },
 
-    // Optional: server-side token check
-    // Uncomment to enable server validation before exam starts
-    /*
-    try {
-      const check = await fetch(ExamConfig.APPS_SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'check_token', tokenHash: hash })
-      });
-      // With no-cors we can't read response — use localStorage as primary guard
-    } catch(e) { console.warn('Server check skipped:', e); }
-    */
-
-    // Assign state
-    ExamState.studentName = name;
-    ExamState.token = token.toUpperCase();
-    ExamState.tokenHash = hash;
+  // Step 2: Start the Exam
+  startExam() {
     ExamState.startTime = Date.now();
+    ExamState.submitted = false;
+    ExamState.currentQIndex = 0;
+    ExamState.remainingSeconds = ExamConfig.EXAM_DURATION_MINUTES * 60;
 
-    // Pick random set
-    const sets = QuestionSets.SETS;
-    ExamState.setId = sets[Math.floor(Math.random() * sets.length)];
-    ExamState.questions = QuestionSets[ExamState.setId];
+    // Initialize tracking tables
+    ExamQuestions.forEach((q) => {
+      ExamState.timeSpent[q.id] = 0;
+    });
 
-    // Update header
-    document.getElementById("hdr-name").textContent = name;
-    document.getElementById("hdr-token").textContent =
-      token.slice(0, 8) + "···";
-    document.getElementById("set-label").textContent =
-      `Set ${ExamState.setId} · ${ExamState.questions.length} Questions`;
+    // Update candidate info in exam header
+    document.getElementById("hdr-candidate-name").textContent = ExamState.name;
+    document.getElementById("hdr-candidate-roll").textContent = ExamState.rollNo;
 
-    // Render
-    renderQuestions(ExamState.questions);
+    // Render Section Tabs & Question Palette
+    this.renderSectionTabs();
+    this.renderPalette();
+
+    // Start Timer
+    this.startGlobalTimer();
+
+    // Show Exam Screen and load Q1
     showScreen("exam");
+    this.loadQuestion(0);
 
-    // Start anti-cheat & timer
+    // Initialize AntiCheat
     AntiCheat.init();
-    Timer.start(ExamConfig.EXAM_DURATION_MINUTES, () => this._autoSubmit());
+  },
 
-    function _loginError(msg) {
-      errEl.textContent = msg;
-      errEl.style.display = "block";
+  // Global Timer (30 minutes shared)
+  startGlobalTimer() {
+    const timerEl = document.getElementById("exam-timer");
+
+    this.updateTimerDisplay();
+
+    ExamState.timerInterval = setInterval(() => {
+      ExamState.remainingSeconds--;
+
+      this.updateTimerDisplay();
+
+      if (ExamState.remainingSeconds <= 0) {
+        clearInterval(ExamState.timerInterval);
+        this.autoSubmit();
+      }
+    }, 1000);
+  },
+
+  updateTimerDisplay() {
+    const timerEl = document.getElementById("exam-timer");
+    if (!timerEl) return;
+
+    const mins = Math.floor(ExamState.remainingSeconds / 60);
+    const secs = ExamState.remainingSeconds % 60;
+
+    timerEl.textContent = `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+
+    if (ExamState.remainingSeconds <= 120) {
+      timerEl.className = "timer-pill danger";
+    } else if (ExamState.remainingSeconds <= 300) {
+      timerEl.className = "timer-pill warn";
+    } else {
+      timerEl.className = "timer-pill normal";
     }
   },
 
-  // ── Manual submit ─────────────────────────────────────
+  // Flush and track time spent on the active question
+  flushActiveQuestionTime() {
+    if (ExamState.activeQuestionStartTime !== null) {
+      const now = Date.now();
+      const deltaSec = Math.floor((now - ExamState.activeQuestionStartTime) / 1000);
+      const activeQ = ExamQuestions[ExamState.currentQIndex];
+      if (activeQ && deltaSec > 0) {
+        ExamState.timeSpent[activeQ.id] = (ExamState.timeSpent[activeQ.id] || 0) + deltaSec;
+      }
+    }
+    ExamState.activeQuestionStartTime = Date.now();
+  },
+
+  // Load a question by index (0 to 14)
+  loadQuestion(index) {
+    if (index < 0 || index >= ExamQuestions.length) return;
+
+    // Track elapsed time from previous question
+    this.flushActiveQuestionTime();
+
+    ExamState.currentQIndex = index;
+    const q = ExamQuestions[index];
+
+    // Mark as visited
+    ExamState.visited[q.id] = true;
+
+    // Render Question Content
+    this.renderQuestionCard(q, index);
+
+    // Update Palette active states
+    this.updatePaletteUI();
+
+    // Update Section Tabs
+    this.updateSectionTabs();
+
+    // Scroll to top of question
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  },
+
+  renderQuestionCard(q, index) {
+    const container = document.getElementById("current-question-container");
+    const isAnswered = !!ExamState.answers[q.id];
+    const isReviewed = !!ExamState.reviewed[q.id];
+
+    // Generate options HTML
+    let optionsHtml = "";
+    q.options.forEach((opt) => {
+      const isSelected = ExamState.answers[q.id] === opt.key;
+      optionsHtml += `
+        <label class="option-item ${isSelected ? "selected" : ""}" onclick="ExamApp.selectOption('${opt.key}')">
+          <input type="radio" name="opt-choice" value="${opt.key}" ${isSelected ? "checked" : ""} />
+          <span class="opt-badge">${opt.key}</span>
+          <span class="opt-text">${this.escapeHtml(opt.text)}</span>
+        </label>
+      `;
+    });
+
+    container.innerHTML = `
+      <div class="question-header">
+        <div class="q-meta-left">
+          <span class="section-tag">${q.sectionTitle}</span>
+          <span class="q-number-pill">Question ${index + 1} of ${ExamQuestions.length}</span>
+        </div>
+        <div class="q-meta-right">
+          <span class="marks-pill">+1.0 Mark</span>
+        </div>
+      </div>
+
+      <div class="q-prompt">${this.escapeHtml(q.prompt)}</div>
+
+      <div class="code-wrapper">
+        <div class="code-header">
+          <span>PSEUDOCODE</span>
+          <span class="lang-tag">Infosys Standard</span>
+        </div>
+        <pre class="pseudocode-block"><code>${this.syntaxHighlight(q.pseudocode)}</code></pre>
+      </div>
+
+      <div class="options-container">
+        ${optionsHtml}
+      </div>
+
+      <div class="question-footer">
+        <div class="footer-left">
+          <button class="btn btn-outline" onclick="ExamApp.prevQuestion()" ${index === 0 ? "disabled" : ""}>
+            &larr; Previous
+          </button>
+          <button class="btn btn-subtle" onclick="ExamApp.clearResponse()">
+            Clear Response
+          </button>
+          <button class="btn ${isReviewed ? "btn-review-active" : "btn-review"}" onclick="ExamApp.toggleReview()">
+            ${isReviewed ? "&#9733; Marked for Review" : "&#9734; Mark for Review"}
+          </button>
+        </div>
+        <div class="footer-right">
+          ${
+            index < ExamQuestions.length - 1
+              ? `<button class="btn btn-primary" onclick="ExamApp.nextQuestion()">Next &rarr;</button>`
+              : `<button class="btn btn-success" onclick="ExamApp.confirmSubmit()">Submit Assessment</button>`
+          }
+        </div>
+      </div>
+    `;
+  },
+
+  selectOption(key) {
+    const q = ExamQuestions[ExamState.currentQIndex];
+    ExamState.answers[q.id] = key;
+    this.renderQuestionCard(q, ExamState.currentQIndex);
+    this.updatePaletteUI();
+    this.updateSectionTabs();
+  },
+
+  clearResponse() {
+    const q = ExamQuestions[ExamState.currentQIndex];
+    delete ExamState.answers[q.id];
+    this.renderQuestionCard(q, ExamState.currentQIndex);
+    this.updatePaletteUI();
+    this.updateSectionTabs();
+  },
+
+  toggleReview() {
+    const q = ExamQuestions[ExamState.currentQIndex];
+    ExamState.reviewed[q.id] = !ExamState.reviewed[q.id];
+    this.renderQuestionCard(q, ExamState.currentQIndex);
+    this.updatePaletteUI();
+  },
+
+  nextQuestion() {
+    if (ExamState.currentQIndex < ExamQuestions.length - 1) {
+      this.loadQuestion(ExamState.currentQIndex + 1);
+    }
+  },
+
+  prevQuestion() {
+    if (ExamState.currentQIndex > 0) {
+      this.loadQuestion(ExamState.currentQIndex - 1);
+    }
+  },
+
+  // Section Tabs Navigation
+  renderSectionTabs() {
+    const container = document.getElementById("section-tabs-bar");
+    container.innerHTML = "";
+
+    ExamConfig.SECTIONS.forEach((sec, idx) => {
+      const tab = document.createElement("button");
+      tab.className = `sec-tab-btn ${idx === 0 ? "active" : ""}`;
+      tab.id = `sec-tab-${sec.id}`;
+      tab.onclick = () => this.switchSection(sec.id);
+      tab.innerHTML = `
+        <span class="sec-name">${sec.title}</span>
+        <span class="sec-count" id="sec-badge-${sec.id}">0/${sec.count}</span>
+      `;
+      container.appendChild(tab);
+    });
+  },
+
+  switchSection(sectionId) {
+    const sec = ExamConfig.SECTIONS.find((s) => s.id === sectionId);
+    if (sec) {
+      this.loadQuestion(sec.start);
+    }
+  },
+
+  updateSectionTabs() {
+    const currentQ = ExamQuestions[ExamState.currentQIndex];
+
+    ExamConfig.SECTIONS.forEach((sec) => {
+      const tab = document.getElementById(`sec-tab-${sec.id}`);
+      if (tab) {
+        if (sec.id === currentQ.sectionId) {
+          tab.classList.add("active");
+        } else {
+          tab.classList.remove("active");
+        }
+      }
+
+      // Count answered
+      let answeredCount = 0;
+      for (let i = sec.start; i < sec.start + sec.count; i++) {
+        const qId = ExamQuestions[i].id;
+        if (ExamState.answers[qId]) answeredCount++;
+      }
+      const badge = document.getElementById(`sec-badge-${sec.id}`);
+      if (badge) badge.textContent = `${answeredCount}/${sec.count}`;
+    });
+  },
+
+  // Question Palette
+  renderPalette() {
+    const grid = document.getElementById("palette-grid");
+    grid.innerHTML = "";
+
+    ExamQuestions.forEach((q, idx) => {
+      const btn = document.createElement("button");
+      btn.className = "palette-btn not-visited";
+      btn.id = `pal-btn-${q.id}`;
+      btn.textContent = idx + 1;
+      btn.onclick = () => this.loadQuestion(idx);
+      grid.appendChild(btn);
+    });
+
+    this.updatePaletteUI();
+  },
+
+  updatePaletteUI() {
+    let answered = 0;
+    let notAnswered = 0;
+    let marked = 0;
+    let notVisited = 0;
+
+    ExamQuestions.forEach((q, idx) => {
+      const btn = document.getElementById(`pal-btn-${q.id}`);
+      if (!btn) return;
+
+      const isCurrent = idx === ExamState.currentQIndex;
+      const isAns = !!ExamState.answers[q.id];
+      const isRev = !!ExamState.reviewed[q.id];
+      const isVis = !!ExamState.visited[q.id];
+
+      btn.className = "palette-btn";
+
+      if (isCurrent) btn.classList.add("current");
+
+      if (isRev && isAns) {
+        btn.classList.add("reviewed-answered");
+        marked++;
+        answered++;
+      } else if (isRev) {
+        btn.classList.add("reviewed");
+        marked++;
+      } else if (isAns) {
+        btn.classList.add("answered");
+        answered++;
+      } else if (isVis) {
+        btn.classList.add("not-answered");
+        notAnswered++;
+      } else {
+        btn.classList.add("not-visited");
+        notVisited++;
+      }
+    });
+
+    // Update palette legend counts
+    const countAns = document.getElementById("pal-count-ans");
+    const countNotAns = document.getElementById("pal-count-notans");
+    const countRev = document.getElementById("pal-count-rev");
+    const countNotVis = document.getElementById("pal-count-notvis");
+
+    if (countAns) countAns.textContent = answered;
+    if (countNotAns) countNotAns.textContent = notAnswered;
+    if (countRev) countRev.textContent = marked;
+    if (countNotVis) countNotVis.textContent = notVisited;
+  },
+
+  // Submission Flow
   confirmSubmit() {
-    if (ExamState.submitted) return;
-    if (!confirm("Submit your exam now? This cannot be undone.")) return;
-    this._doSubmit();
+    this.flushActiveQuestionTime();
+
+    let answeredCount = Object.keys(ExamState.answers).length;
+    let totalCount = ExamQuestions.length;
+    let unattempted = totalCount - answeredCount;
+
+    const modal = document.getElementById("submit-confirm-modal");
+    document.getElementById("modal-ans-count").textContent = answeredCount;
+    document.getElementById("modal-unans-count").textContent = unattempted;
+    modal.classList.add("show");
   },
 
-  // ── Auto submit (timer expired) ───────────────────────
-  _autoSubmit() {
-    if (ExamState.submitted) return;
-    this._doSubmit(true);
+  closeModal() {
+    const modal = document.getElementById("submit-confirm-modal");
+    modal.classList.remove("show");
   },
 
-  // ── Core submit logic ─────────────────────────────────
-  async _doSubmit(auto = false) {
+  autoSubmit() {
+    alert("Time is up! Your assessment is being submitted automatically.");
+    this.executeSubmit();
+  },
+
+  executeSubmit() {
+    this.closeModal();
+
     if (ExamState.submitted) return;
     ExamState.submitted = true;
     ExamState.endTime = Date.now();
 
-    // Lock all textareas
-    document.querySelectorAll("textarea.code-input").forEach((ta) => {
-      ta.disabled = true;
-    });
+    // Flush current question timer
+    this.flushActiveQuestionTime();
 
-    // Disable submit button
-    const submitBtn = document.getElementById("btn-submit");
-    if (submitBtn) {
-      submitBtn.disabled = true;
-      submitBtn.textContent = "Submitted";
-    }
-    Timer.stop();
+    // Stop global timer
+    if (ExamState.timerInterval) clearInterval(ExamState.timerInterval);
+
+    // Calculate Scores & Diagnostics
+    const evaluation = this.evaluateExam();
+
+    // Render Detailed Results
+    this.renderResultScreen(evaluation);
+
+    // Background submit to Google Apps Script if reachable
+    this.sendBackgroundSubmission(evaluation);
 
     showScreen("result");
-    document.getElementById("submit-status").textContent =
-      "Evaluating your answers...";
-    document.getElementById("submit-status").className = "status-msg";
+  },
 
-    // Evaluate
-    const { results, total } = await Evaluator.evaluateAll();
+  evaluateExam() {
+    let totalScore = 0;
+    const questionResults = [];
 
-    // Render result
-    renderResult(total, results);
-    document.getElementById("final-score").textContent = total;
+    // Section breakdown buckets
+    const sectionStats = {
+      nested_loops: { id: "nested_loops", title: "Nested Loops", total: 0, attempted: 0, correct: 0, wrong: 0, timeSec: 0 },
+      recursion: { id: "recursion", title: "Recursion", total: 0, attempted: 0, correct: 0, wrong: 0, timeSec: 0 },
+      bitwise: { id: "bitwise", title: "Bitwise Operations", total: 0, attempted: 0, correct: 0, wrong: 0, timeSec: 0 }
+    };
 
-    // Mark question cards
-    results.forEach((r) => {
-      const card = document.getElementById(`qcard-${r.q.id}`);
-      if (card) card.classList.add(r.result.pass ? "correct" : "wrong");
+    ExamQuestions.forEach((q) => {
+      const selectedKey = ExamState.answers[q.id] || null;
+      const isCorrect = selectedKey === q.correctAnswer;
+      const timeSpentSec = ExamState.timeSpent[q.id] || 0;
+
+      const sec = sectionStats[q.sectionId];
+      if (sec) {
+        sec.total++;
+        sec.timeSec += timeSpentSec;
+        if (selectedKey) {
+          sec.attempted++;
+          if (isCorrect) {
+            sec.correct++;
+          } else {
+            sec.wrong++;
+          }
+        }
+      }
+
+      if (isCorrect) totalScore += ExamConfig.MARKS_PER_QUESTION;
+
+      questionResults.push({
+        q,
+        selectedKey,
+        isCorrect,
+        isAttempted: !!selectedKey,
+        timeSpentSec
+      });
     });
 
-    // Mark token used locally
-    const usedKey = `exam_used_${ExamState.tokenHash}`;
-    localStorage.setItem(usedKey, Date.now().toString());
+    const totalTimeSec = Math.floor((ExamState.endTime - ExamState.startTime) / 1000);
 
-    // Submit to Google Sheets
-    document.getElementById("submit-status").textContent =
-      "Submitting results to server...";
-    const submitResult = await Submission.submit(total, results);
+    return {
+      totalScore,
+      maxScore: ExamConfig.TOTAL_MARKS,
+      percentage: Math.round((totalScore / ExamConfig.TOTAL_MARKS) * 100),
+      totalTimeSec,
+      sectionStats,
+      questionResults
+    };
+  },
 
-    const statusEl = document.getElementById("submit-status");
-    if (submitResult.ok) {
-      statusEl.textContent = "✓ Results submitted successfully.";
-      statusEl.className = "status-msg ok";
+  renderResultScreen(evaluation) {
+    // Header candidate display
+    document.getElementById("res-candidate-name").textContent = ExamState.name;
+    document.getElementById("res-candidate-roll").textContent = ExamState.rollNo;
+
+    // Scorecard
+    document.getElementById("res-score-num").textContent = evaluation.totalScore;
+    document.getElementById("res-score-total").textContent = `out of ${evaluation.maxScore}`;
+    document.getElementById("res-percentage").textContent = `${evaluation.percentage}%`;
+    document.getElementById("res-total-time").textContent = this.formatTime(evaluation.totalTimeSec);
+
+    // Section-wise Table
+    const tbody = document.getElementById("res-section-tbody");
+    tbody.innerHTML = "";
+
+    const weakSections = [];
+
+    Object.values(evaluation.sectionStats).forEach((sec) => {
+      const accuracy = sec.attempted > 0 ? Math.round((sec.correct / sec.attempted) * 100) : 0;
+      const scoreRatio = sec.correct / sec.total;
+
+      if (scoreRatio < 0.6) {
+        weakSections.push({ title: sec.title, id: sec.id, accuracy, correct: sec.correct, total: sec.total });
+      }
+
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td class="sec-col"><strong>${sec.title}</strong></td>
+        <td>${sec.attempted} / ${sec.total}</td>
+        <td class="text-success"><strong>${sec.correct}</strong></td>
+        <td class="text-danger">${sec.wrong}</td>
+        <td class="text-muted">${sec.total - sec.attempted}</td>
+        <td>${this.formatTime(sec.timeSec)}</td>
+        <td>
+          <span class="acc-badge ${accuracy >= 70 ? "acc-high" : accuracy >= 40 ? "acc-mid" : "acc-low"}">
+            ${accuracy}%
+          </span>
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
+
+    // Render Diagnostic & Focus Areas
+    this.renderDiagnosticTips(weakSections, evaluation);
+
+    // Render Question Review Cards
+    this.renderQuestionReviews(evaluation.questionResults);
+  },
+
+  renderDiagnosticTips(weakSections, evaluation) {
+    const diagBox = document.getElementById("res-diagnostic-box");
+
+    let focusHtml = "";
+    if (weakSections.length > 0) {
+      focusHtml += `
+        <div class="diag-alert">
+          <div class="diag-alert-title">&#9888; Priority Focus Areas Identified</div>
+          <p>Based on your performance, the following topic(s) need immediate practice:</p>
+          <ul>
+            ${weakSections
+              .map(
+                (w) =>
+                  `<li><strong>${w.title}</strong> &mdash; Scored ${w.correct}/${w.total} (${w.accuracy}% accuracy). ${this.getTopicAdvice(w.id)}</li>`
+              )
+              .join("")}
+          </ul>
+        </div>
+      `;
     } else {
-      statusEl.textContent =
-        "⚠ Could not reach server. Screenshot this page and send to instructor.";
-      statusEl.className = "status-msg err";
+      focusHtml += `
+        <div class="diag-alert success">
+          <div class="diag-alert-title">&#10004; Outstanding Performance!</div>
+          <p>You demonstrated consistent accuracy across all three topics (Nested Loops, Recursion, and Bitwise Operations). Review the speed tips below to maintain your edge.</p>
+        </div>
+      `;
+    }
+
+    diagBox.innerHTML = `
+      ${focusHtml}
+      <div class="infosys-tips-grid">
+        <div class="tip-card">
+          <div class="tip-title">1. Bitwise Operator Precedence</div>
+          <p>In Infosys pseudocodes, operator precedence is the most common trap:</p>
+          <div class="tip-formula">Arithmetic (+, -) &gt; Shifts (&lt;&lt;, &gt;&gt;) &gt; Relational &gt; &amp; &gt; ^ &gt; |</div>
+          <p class="tip-sub">Never evaluate left-to-right! Always calculate additions before bitwise AND/XOR.</p>
+        </div>
+
+        <div class="tip-card">
+          <div class="tip-title">2. Recursion Tree Methodology</div>
+          <p>Trace recursive calls from the bottom up on rough paper:</p>
+          <ul class="tip-list">
+            <li>Identify the base condition return values first.</li>
+            <li>Draw branches for each call; don't calculate mentally.</li>
+            <li>Track in-function variable mutations before recursive calls.</li>
+          </ul>
+        </div>
+
+        <div class="tip-card">
+          <div class="tip-title">3. Nested Loop Boundary Traps</div>
+          <p>Always verify the start, end, and step increments:</p>
+          <ul class="tip-list">
+            <li>Check if inner loop limits depend on the outer variable (e.g., <code>n from m to 4</code>).</li>
+            <li>Look out for <code>break</code> or <code>continue</code> conditions that truncate loop cycles.</li>
+            <li>Notice variable re-initialization (e.g. <code>q = 3</code> inside the outer while loop).</li>
+          </ul>
+        </div>
+
+        <div class="tip-card">
+          <div class="tip-title">4. Bit Manipulation Fast Tricks</div>
+          <p>Key shortcuts for instant solving:</p>
+          <ul class="tip-list">
+            <li><code>n &amp; (n - 1)</code> clears the lowest set bit.</li>
+            <li><code>x ^ x = 0</code> and <code>x ^ 0 = x</code>.</li>
+            <li><code>(a &amp; b) ^ (a | b)</code> is mathematically equal to <code>a ^ b</code>.</li>
+            <li><code>x &lt;&lt; 1</code> doubles <code>x</code>; <code>x &gt;&gt; 1</code> performs integer halving.</li>
+          </ul>
+        </div>
+      </div>
+    `;
+  },
+
+  getTopicAdvice(topicId) {
+    switch (topicId) {
+      case "nested_loops":
+        return "Focus on step values (step 2, down to), conditional break statements, and tracking variable accumulation across outer loop resets.";
+      case "recursion":
+        return "Practice drawing recursion trees on paper and tracking stack unwinding values rather than trying to solve recursively in your head.";
+      case "bitwise":
+        return "Strictly memorize operator precedence: Arithmetic (+) evaluates before Bitwise AND (&), which evaluates before XOR (^).";
+      default:
+        return "Review core fundamentals and trace code line by line.";
     }
   },
-};
 
-// ── Global error for login  ───────────────────────────────
-function _loginError(msg) {
-  const errEl = document.getElementById("login-error");
-  errEl.textContent = msg;
-  errEl.style.display = "block";
-  const btn = document.getElementById("btn-start");
-  btn.disabled = false;
-  btn.textContent = "Verify & Start Exam";
-}
+  renderQuestionReviews(questionResults) {
+    const list = document.getElementById("res-questions-list");
+    list.innerHTML = "";
+
+    questionResults.forEach((item, index) => {
+      const q = item.q;
+      const card = document.createElement("div");
+      card.className = `review-qcard ${item.isCorrect ? "card-correct" : item.isAttempted ? "card-wrong" : "card-skipped"}`;
+      card.id = `rev-card-${q.id}`;
+      card.dataset.status = item.isCorrect ? "correct" : item.isAttempted ? "incorrect" : "skipped";
+
+      const selectedOptObj = q.options.find((o) => o.key === item.selectedKey);
+      const correctOptObj = q.options.find((o) => o.key === q.correctAnswer);
+
+      const statusBadge = item.isCorrect
+        ? `<span class="res-badge badge-correct">&#10004; Correct</span>`
+        : item.isAttempted
+        ? `<span class="res-badge badge-wrong">&#10008; Incorrect</span>`
+        : `<span class="res-badge badge-skipped">&#8722; Unattempted</span>`;
+
+      card.innerHTML = `
+        <div class="review-header">
+          <div class="review-meta">
+            <span class="q-tag">${q.sectionTitle}</span>
+            <span class="q-title">Question ${index + 1}: ${q.title}</span>
+          </div>
+          <div class="review-status">
+            ${statusBadge}
+            <span class="time-spent-tag">&#9201; Time: ${this.formatTime(item.timeSpentSec)}</span>
+          </div>
+        </div>
+
+        <div class="q-prompt">${this.escapeHtml(q.prompt)}</div>
+
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>PSEUDOCODE</span>
+          </div>
+          <pre class="pseudocode-block"><code>${this.syntaxHighlight(q.pseudocode)}</code></pre>
+        </div>
+
+        <div class="answers-comparison">
+          <div class="ans-box ${item.isCorrect ? "ans-box-correct" : "ans-box-selected"}">
+            <span class="ans-label">Your Answer:</span>
+            <span class="ans-value">
+              ${
+                selectedOptObj
+                  ? `<strong>Option ${selectedOptObj.key}:</strong> ${this.escapeHtml(selectedOptObj.text)}`
+                  : `<em class="text-muted">Not Answered</em>`
+              }
+            </span>
+          </div>
+          <div class="ans-box ans-box-correct">
+            <span class="ans-label">Correct Answer:</span>
+            <span class="ans-value">
+              <strong>Option ${correctOptObj.key}:</strong> ${this.escapeHtml(correctOptObj.text)}
+            </span>
+          </div>
+        </div>
+
+        <div class="explanation-box">
+          <div class="exp-title">&#128214; Step-by-Step Explanation &amp; Trace:</div>
+          <div class="exp-content">${q.explanation}</div>
+        </div>
+      `;
+
+      list.appendChild(card);
+    });
+  },
+
+  filterReview(type) {
+    document.querySelectorAll(".filter-btn").forEach((btn) => btn.classList.remove("active"));
+    const activeBtn = document.getElementById(`filter-btn-${type}`);
+    if (activeBtn) activeBtn.classList.add("active");
+
+    const cards = document.querySelectorAll(".review-qcard");
+    cards.forEach((c) => {
+      if (type === "all") {
+        c.style.display = "block";
+      } else {
+        c.style.display = c.dataset.status === type ? "block" : "none";
+      }
+    });
+  },
+
+  printResult() {
+    window.print();
+  },
+
+  retakeExam() {
+    if (confirm("Are you sure you want to retake the assessment? Your current scores will be cleared.")) {
+      ExamState.answers = {};
+      ExamState.reviewed = {};
+      ExamState.visited = {};
+      ExamState.timeSpent = {};
+      ExamState.submitted = false;
+      ExamState.tabSwitches = 0;
+      showScreen("login");
+    }
+  },
+
+  // Background Submission (Google Apps Script)
+  async sendBackgroundSubmission(evaluation) {
+    if (!ExamConfig.APPS_SCRIPT_URL) return;
+
+    const payload = {
+      name: ExamState.name,
+      rollNo: ExamState.rollNo,
+      score: evaluation.totalScore,
+      maxScore: evaluation.maxScore,
+      percentage: evaluation.percentage,
+      totalTimeSec: evaluation.totalTimeSec,
+      tabSwitches: ExamState.tabSwitches,
+      answers: evaluation.questionResults.map((r) => ({
+        qId: r.q.id,
+        section: r.q.sectionTitle,
+        selected: r.selectedKey,
+        correct: r.q.correctAnswer,
+        isCorrect: r.isCorrect,
+        timeSec: r.timeSpentSec
+      })),
+      timestamp: new Date().toISOString()
+    };
+
+    try {
+      await fetch(ExamConfig.APPS_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+    } catch (e) {
+      // Non-blocking catch
+      console.log("Background report sync:", e);
+    }
+  },
+
+  // Helpers
+  formatTime(totalSeconds) {
+    const s = Math.max(0, Math.floor(totalSeconds));
+    const m = Math.floor(s / 60);
+    const sec = s % 60;
+    if (m === 0) return `${sec}s`;
+    return `${m}m ${sec}s`;
+  },
+
+  escapeHtml(str) {
+    if (!str) return "";
+    return str
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  },
+
+  syntaxHighlight(code) {
+    if (!code) return "";
+    let safe = this.escapeHtml(code);
+
+    // Keywords
+    const keywords = [
+      "Integer", "Set", "for", "from", "to", "down", "step", "end for",
+      "while", "end while", "if", "then", "else", "else if", "end if",
+      "break", "function", "end function", "return", "print", "mod", "or", "and"
+    ];
+
+    keywords.forEach((kw) => {
+      const reg = new RegExp(`\\b(${kw})\\b`, "g");
+      safe = safe.replace(reg, '<span class="kw">$1</span>');
+    });
+
+    // Numbers
+    safe = safe.replace(/\b(\d+)\b/g, '<span class="num">$1</span>');
+
+    // Operators
+    safe = safe.replace(/(\^|&amp;|\||&lt;&lt;|&gt;&gt;)/g, '<span class="op">$1</span>');
+
+    return safe;
+  }
+};

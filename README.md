@@ -1,31 +1,49 @@
-# Frontend Coding Exam Platform
+# Infosys 2026 Batch Pseudo-Code Assessment Platform
 
-This repository contains a simple, client-side frontend coding examination platform. It evaluates HTML, CSS, and JS answers within the browser using iframes and sandboxes, tracks anti-cheat metrics, and submits scores via Google Apps Script (GAS) to Google Sheets. It also includes academic tools for pairing students and assigning projects based on exam results.
+A lightweight, high-performance, client-side assessment platform tailored for Infosys 2026 campus placement recruitment preparation.
 
-## Codebase Index
+**Live Assessment Link:** [https://kumarreddy7.github.io/frontend-exam/](https://kumarreddy7.github.io/frontend-exam/)
 
-### Core Exam Application
-* **`index.html`**
-  The main entry point for the exam platform. Contains the layout and UI for the Login Screen, Exam Screen, Result Screen, and Anti-Cheat overlays. Also contains embedded CSS for styling the application.
-* **`app.js`**
-  The core engine of the exam portal. Key modules include:
-  * **AntiCheat**: Detects tab switches, DevTools opening, disables right-click, and blocks keyboard shortcuts.
-  * **ExamState & Timer**: Manages the exam session data and the countdown timer.
-  * **Evaluator**: Dynamically runs student-provided HTML/JS/CSS inside a hidden iframe sandbox to safely execute and validate the code against predefined rules.
-  * **Submission**: Sends exam results, including anti-cheat logs, to a Google Apps Script URL using a hidden form POST to bypass CORS.
-  * **UI Rendering**: Dynamically generates question cards, code editors, live previews, and the final score breakdown.
-* **`questions.js`**
-  Contains the question bank organized into sets (A, B, C, D). Each question includes its ID, title, description, starter code, and a custom `validate(doc)` function which inspects the sandboxed DOM to verify if the student's solution is correct.
-* **`config.js`**
-  Configuration file for the exam. Defines constants such as exam duration, marks per question, the Google Apps Script endpoint URL, and a set of valid SHA-256 token hashes used for authentication.
+---
 
-### Administrative / Academic Tools
-* **`assign-tool-final.html`**
-  A standalone utility for instructors. It acts as an "Exam Result Analyser". It allows instructors to paste student roll numbers and scores, randomly pairs them into teams, and assigns projects to each team with a polished UI.
-* **`assign-tool.html` & `assign-tool1.html`**
-  Earlier iterations or alternative versions of the `assign-tool-final.html` team pairing and project assignment tool.
+## Key Features
 
-## Architecture Highlights
-* **Client-side Evaluation**: No backend is required to run the code. Student code is injected into `<iframe>` elements to isolate execution and prevent interference with the main exam application.
-* **Serverless Submission**: Final scores and logs are pushed directly to Google Sheets via Google Apps Script.
-* **Anti-Cheat Measures**: Tab visibility API tracking, generic DevTools size-based detection, and keyboard/mouse restrictions.
+1. **Pure Multiple-Choice Assessment (Choose the Correct Answers)**
+   - 15 authentic Infosys recruitment test pseudocode questions.
+   - 3 core technical sections:
+     - **Nested Loops** (Questions 1 – 5)
+     - **Recursion** (Questions 6 – 10)
+     - **Bitwise Operations** (Questions 11 – 15)
+   - Zero difficulty labels shown to candidates (maintains standard assessment environment).
+
+2. **Frictionless Candidate Access**
+   - No access tokens or passwords needed.
+   - Candidates enter their Full Name and Roll Number / Registration ID to begin.
+
+3. **Combined 30-Minute Shared Countdown Timer**
+   - Single 30:00 timer across all three sections.
+   - No artificial section time cutoffs: solving quickly in one section automatically carries remaining time over to subsequent sections.
+   - Full question palette navigation allows candidates to move between questions and sections freely.
+
+4. **Granular Time & Answer Tracking**
+   - Continuously records time spent on each individual question.
+   - Aggregates section-wise time expenditure and accuracy metrics.
+
+5. **Instant In-Depth Solutions & Diagnostic Feedback**
+   - Immediate review screen upon exam submission (or timer expiration).
+   - Shows candidate's selected answer vs. verified correct answer.
+   - Complete step-by-step mathematical & algorithmic trace tables for all 15 questions.
+   - Diagnostic analysis highlighting weak topics with actionable Infosys preparation tips (operator precedence, recursion tree tracing, loop boundary conditions, and bit manipulation shortcuts).
+
+6. **Clean, Distraction-Free Interface**
+   - Displays only the candidate's name and roll number.
+   - No external marketing, no AI watermarks/branding, and no clutter.
+
+---
+
+## Structure
+- `index.html`: Portal UI (Registration, Instructions, Live Test with Palette, and Comprehensive Results Review).
+- `questions.js`: 15 mathematically verified Infosys 2026 pseudocode questions, options, and step-by-step traces.
+- `app.js`: State manager, 30-minute timer, time tracker, palette controller, and diagnostic engine.
+- `config.js`: Assessment parameters and section configuration.
+- `answer-key.html`: Standalone official instructor solution sheet.

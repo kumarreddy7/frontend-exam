@@ -1,101 +1,29 @@
+/**
+ * config.js
+ * Examination Configuration for Infosys 2026 Batch Assessment
+ */
+
 const ExamConfig = {
-  EXAM_DURATION_MINUTES: 60,
-  // 20 MCQs (1 mark each) + 2 Code Questions (15 marks each) = 50 total marks
-  QUESTIONS_PER_SET: 22, 
-  BEST_N_QUESTIONS: 22, // Count all questions
+  EXAM_TITLE: "Infosys Pseudo-Code Assessment 2026",
+  EXAM_DURATION_MINUTES: 30, // 30 minutes combined
+  TOTAL_QUESTIONS: 15,
+  MARKS_PER_QUESTION: 1,
+  TOTAL_MARKS: 15,
 
-  // Time Window Constraints (9th June 2026, 9:30am to 10:30am)
-  ENFORCE_TIME_WINDOW: true,
-  EXAM_DATE: "2026-06-09",
-  EXAM_START_TIME: "09:30",
-  EXAM_END_TIME: "10:30",
-  BYPASS_TIME_CHECK: true, // Set to false in production
+  // Sections definition
+  SECTIONS: [
+    { id: "nested_loops", title: "Nested Loops", start: 0, count: 5 },
+    { id: "recursion", title: "Recursion", start: 5, count: 5 },
+    { id: "bitwise", title: "Bitwise Operations", start: 10, count: 5 }
+  ],
 
-  APPS_SCRIPT_URL:
-    "https://script.google.com/macros/s/AKfycbwfSJTecVuJ3JhihguoiyV2jCyqrvqi65pGZ_MUIYz80UyWwsFl5VF6U35i8lnHs_yG/exec",
-
-  VALID_TOKEN_HASHES: new Set([
-    "0057e786e00a2a3bc0f6c994ea4511ffd007e4ed8ac294c7bbb8769d9061be64", // TEST-TOKEN
-    "c099d58c2228fb671334b3b3c44ae5e8df287c9cde3b3b03583dc3abfc26ebc3", // EXAM-681DA2
-    "f47451735f60fc421561b69f555e3d849f5e44a19114d47eacbc9e92ffae777a", // EXAM-BFE3VW
-    "63eb1fcaddee1d56cc44bfa7e14884e7b766f9fa1a0ed18ab92516524b7d3738", // EXAM-67Z30A
-    "36a03470717575ab9c9f9bd37a36464e07987e12b555bc83b38b654d1ba41cc8", // EXAM-ZLR5UM
-    "874a5d3429f112f3a83f83c78050476570814ba56b7afd00abdf64119d1cfc15", // EXAM-1BOCG2
-    "90e8a6213da91e94e54a8c8f82c36894022dc82081618e3fd03512267c8091c5", // EXAM-EFZ9L8
-    "56904351b9daa6bf85b2f1d3d5a4ed41fed27c17fb138b62be630e4b566aa679", // EXAM-YN549L
-    "83fea0fbc529c0004ed9de1af02b90337a63e68aa73b0862e77f0f2af746c54d", // EXAM-UE6ZUW
-    "879a96b78c1ea45043e73be6bb1f335c342f546cedcbe33e468615d4ee3df087", // EXAM-6Y66BZ
-    "8985b292f1f4770e171c0240adc246259591c351d39099174df236f1730bf27b", // EXAM-EZ40UF
-    "7d157960cb6e9d6d8c949125810b99fd195afa4f7bac8ac64d8bb5cb1f6d2bb3", // EXAM-Z1EX3F
-    "808e0db4fec4f3f30fe6c60883bddd4b55dc2ed7c23f90b4490b7248fefc5c32", // EXAM-A9FSNW
-    "9ab28509fcdcf57c471e72f4caf4bdade7edffd6ca39ddf6f1fdc29572620d5d", // EXAM-MA5BZM
-    "d78cf2a8af8e1762e7d63690b1ffb971c65b8bef9a851353105ac687110c8968", // EXAM-ZS7QW3
-    "d28955e430ad4352a738581933f720fcdd421f62f4f72408a7ad3b4f342264b3", // EXAM-PNR7ER
-    "e2177a98e9d75484cdb9e3cb0ba7a96b5daadfb43b0787a2771eb5590f0aa8e5", // EXAM-2T2AY7
-    "d9c1c5c452bbbdcb736af3ad91cfc70b683db01f5cba7523c9fe95f0bdc5410e", // EXAM-RTAWC6
-    "4e761399c33c5c072de4f89d05b04cab5b93354b0d853f352f73f8931f358f1b", // EXAM-93ENP3
-    "9c10eada677136ffb2ee2da89f83e7ab950ee09e42c404a9a9a51655aecb7dd3", // EXAM-D4MYHN
-    "f80070234fbdebe3b9158f51a3fd82327c23859aba7dc1a749e1f9c005ddb337", // EXAM-GTHW20
-    "0d0d12577ebb7f57dae98bff55d8ff3e75e1a00e203192770c99643569aa0b55", // EXAM-KMNEVE
-    "0192649fb45c5b2a60986619d07eb62314ad7325cc1614dd9befca3b7032512e", // EXAM-PBYZJC
-    "526cc5252d474dfeb2590165aee89d1772e6955255921441c359c81e5fb86997", // EXAM-VV2B8U
-    "6fc159979bfe894f060c96fce5380d1bd38e8210f3d31dd5145628192f3b59ac", // EXAM-995AR4
-    "31a066c7b01ea345813d44b78e61059b866a2b8d23c6d75a035f213f47b45744", // EXAM-7I4QZQ
-    "475e1cddc209b167d960f6c1cc5515c2aeb32614df4087637334ebbbeb3973d9", // EXAM-CH8OJ9
-    "1245a6276bd23ed2c92f68681fab669f870d705bdefbe2aa845429714930e6c6", // EXAM-M1WRKP
-    "7667be1bf60fead4916acb850fc6052ae9e62834a3c5143237c6ec5f0fea41a0", // EXAM-W2Z66Q
-    "7cf884ce8382c2e702ee491e8998f9a801fd567ca66e32aaa9a2e862480e26c1", // EXAM-YVJ9JC
-    "0893e40d7578de90d0ef68d0d610ae6adc65e9d205af548ab72f72849721ba46", // EXAM-3HATJE
-    "4de5bb553de06e2c485b8e59cce56c52fb8a8c750c28ed0a9bad31208e74ed6b", // EXAM-CJS6FE
-    "c192ba4bc5d909a0ad8f14a4b251ec7b64cb0441aa8c75147261a50cc06e26d5", // EXAM-1WN0RE
-    "dd429acfdfa684042c842320c220c7d499e705210ee6ea581e5fc0a9f0f1e31b", // EXAM-5NYLTR
-    "1021d74dc929367d1f6bd2e4287c778356d4ed01cec902ae494f2713b0b186ab", // EXAM-K5XREP
-    "f207876e6774e46898e56630b5768a6c79a28604d0dae5f797b4d1940a8fd3c2", // EXAM-1W2A6O
-    "6ee9f753c206c86835ef11bfaafb128376edf44c44a80b10bed6e3a3d4b6f589", // EXAM-ZAI0MP
-    "5f8a6bde2aec8abce4d6c86c25c69f2e3080f847b7468e53099c80e80b17ed8b", // EXAM-TWDPZT
-    "5ce7de2239c35648a88db05e5981730b1a60b42ef4ab34edabd81e1ccddadec1", // EXAM-14M4EJ
-    "c160aa928722e2e4c4655c996f20e3b55db11808a616019e49fa4094e2dc7608", // EXAM-K1G3W0
-    "5868049440eb392420391605db924964a0d370d9fb2e47742ca77365491a46d0", // EXAM-43XN3H
-    "9837e2666a37717d69c0bbd7c9441a68a2a35b075789192a20ad0f726e822c40", // EXAM-OYP0VA
-    "a0f68990a2497a14cc97a760807423e1b9ac0aafb8d3fed10dd04f80dd6b873a", // EXAM-VPN212
-    "7ad4e92dbaaf94931216b0035a52383d32114a07536d2d2da0e24b45a3bc2949", // EXAM-F90S63
-    "064097a668c5e069356a8fe19f247ad2434715e14ad8bc0fbc8b55bce6811d7d", // EXAM-96NP35
-    "7b67f65cfc3cb886a5ac04a7cf49b4190dccbe62fd47880f6c132f9ef36fa48e", // EXAM-A82OV6
-    "374a4ea54ddebac9a55c07fee67efcae0fb17e13eb7cff00a8e973333009affb", // EXAM-PDGT4N
-    "0fd41f9de971e9589e01227926314badd7a0c476ba7f5001db61d0606eb0471d", // EXAM-6BT4GM
-    "87845154bfbf2bd3adac0416f9bdd85e468b0a57c03cf591431e1c80de5b09ba", // EXAM-DJD9HS
-    "d4ba79676bce4940753d09e543467bbc000b5fc3e3e29a89450ba7434a735934", // EXAM-TRGBWD
-    "08f04d87b5ef608aa0b89f0716535bfc791d7c0af97dbf6bc5ceada1cdd2b145", // EXAM-NNBG8P
-    "7930770eb51c057fe78294eb12628a01e0a9f7086aeb2e11238f50af901d0d3b", // EXAM-RG0OYD
-    "eb6f5ffc04637b0676a87494fcf11dffee233f97aa60152699ca507dd3318426", // EXAM-HEN4T2
-    "5b785c5ea31d1e6dc519f3b72fb791faab9b7a99ffa26ae3d4a401c5da519925", // EXAM-RU562R
-    "5e3a3654aeb2d4adcf7685d97439afcae066ca2f11c8481523bf8bc7a9b80275", // EXAM-V4VDP0
-    "3d8fc4c173df1cb8643a63b17325d5e3bac8089aa0d12a60f81412f2cec46425", // EXAM-X7U1MB
-    "12e3edac9425bf02041b5139169d9e260e5f06264da71815ade36669d43c8691", // EXAM-2HLSS6
-    "f2c41fe20b3abc6c99116f3e8b88d0e9325bb7a05d1cc4037012ce3182dc66fd", // EXAM-B9T669
-    "4f1b54021b9066ab39dc4fae43ec5d82fc5dae762159f0c7db61d71b714e92ea", // EXAM-1VPNXW
-    "ced2019d39aacf6f27072996834de71db7b42315769b1956939eb98e0e954bbc", // EXAM-JVI14P
-    "82a5d12058d8e67ffe106a09735020371f485f5d08e67ceb5abafc1424e0d4bf", // EXAM-I7Z69D
-  ]),
-
+  // Anti-cheat controls
   MAX_TAB_SWITCHES: 3,
   DISABLE_RIGHTCLICK: true,
-  DISABLE_COPY: false,
+  DISABLE_COPY: true,
   DETECT_DEVTOOLS: true,
 
-  async hashToken(raw) {
-    const enc = new TextEncoder().encode(raw.trim().toUpperCase());
-    const buf = await crypto.subtle.digest("SHA-256", enc);
-    return Array.from(new Uint8Array(buf))
-      .map((b) => b.toString(16).padStart(2, "0"))
-      .join("");
-  },
-
-  async validateToken(raw) {
-    const hash = await this.hashToken(raw);
-    return {
-      valid: this.VALID_TOKEN_HASHES.has(hash),
-      hash,
-    };
-  },
+  // Optional background submission endpoint (Google Sheets via Apps Script)
+  APPS_SCRIPT_URL:
+    "https://script.google.com/macros/s/AKfycbwfSJTecVuJ3JhihguoiyV2jCyqrvqi65pGZ_MUIYz80UyWwsFl5VF6U35i8lnHs_yG/exec"
 };
